@@ -5,13 +5,17 @@ defineEmits(['start'])
 
 <template>
   <div class="flex flex-col items-center justify-center min-h-screen text-center px-4 bg-gradient-to-b from-legal-navy/5 to-white">
-    <div class="bg-legal-navy/10 p-4 rounded-full mb-6 animate-fade-in-down">
-      <FileText class="w-12 h-12 text-legal-navy" />
+    <div class="mb-16 animate-fade-in-down">
+      <div class="w-28 h-28 bg-gradient-to-br from-legal-navy to-slate-700 rounded-3xl flex items-center justify-center shadow-2xl mt-4">
+        <svg class="w-14 h-14 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
+        </svg>
+      </div>
     </div>
-    <h1 class="text-5xl md:text-7xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-legal-navy to-slate-700 mb-6 tracking-tight animate-fade-in-up">
-      LegalEase Taiwan
-      <span class="block text-3xl md:text-4xl mt-4 font-medium text-slate-600">法律文件生成助手</span>
-    </h1>
+    
+    <p class="text-lg md:text-xl text-slate-500 font-light mb-12 tracking-wide animate-fade-in-up delay-100 max-w-2xl mx-auto">
+       賦予您處理租賃爭議的法律力量，<br class="md:hidden" />簡單、快速、專業。
+    </p>
     <div class="grid md:grid-cols-2 gap-6 w-full max-w-5xl animate-fade-in-up delay-200 px-4">
       <!-- Landlord Card -->
       <div class="bg-white/90 backdrop-blur-sm rounded-3xl p-8 border hover:border-legal-navy/30 shadow-xl transition-all duration-300 hover:shadow-2xl flex flex-col items-center text-center group">
