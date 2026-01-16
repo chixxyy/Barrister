@@ -146,7 +146,7 @@ const handleDateInput = (event: Event, field: 'leaseStart' | 'leaseEnd') => {
     <div class="mb-2 shrink-0">
       <button 
         @click="$emit('home')" 
-        class="mb-4 text-slate-500 hover:text-legal-navy flex items-center text-sm font-medium transition-colors group"
+        class="mb-2 px-3 py-2 -ml-3 text-slate-500 hover:text-legal-navy hover:bg-slate-50 rounded-lg flex items-center text-sm font-medium transition-all group"
       >
          <Home class="w-4 h-4 mr-1 group-hover:-translate-x-1 transition-transform" /> 回首頁
       </button>
@@ -338,9 +338,9 @@ const handleDateInput = (event: Event, field: 'leaseStart' | 'leaseEnd') => {
         v-if="currentStep > 1" 
         @click="prev"
         type="button"
-        class="px-6 py-2 text-slate-600 font-medium hover:text-legal-navy flex items-center transition-colors hover:bg-slate-50 rounded-lg"
+        class="px-6 py-2 text-slate-600 font-medium hover:text-legal-navy flex items-center transition-colors hover:bg-slate-50 rounded-lg group"
       >
-        <ChevronLeft class="w-4 h-4 mr-1" /> 上一步
+        <ChevronLeft class="w-4 h-4 mr-1 group-hover:-translate-x-1 transition-transform" /> 上一步
       </button>
       <div v-else></div>
 
