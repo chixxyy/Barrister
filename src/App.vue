@@ -14,6 +14,14 @@ const previewScale = ref(1)
 const handleStart = (role: 'landlord' | 'tenant', type?: 'letter' | 'contract') => {
   store.userRole = role
   if (type) store.documentType = type
+  
+  // Set default category based on role to avoid mismatch
+  if (role === 'landlord') {
+    store.category = '欠繳租金'
+  } else {
+    store.category = '押金返還'
+  }
+  
   started.value = true
 }
 
@@ -50,6 +58,7 @@ const handleTouchMove = (e: TouchEvent) => {
   if (!isDragging.value) return
   if (!e.touches || e.touches.length === 0) return
   const touch = e.touches[0]
+  if (!touch) return
   // Calculate bottom distance: Window Height - Touch Y
   // Subtracting half the button height (28px) roughly keeps finger in center relative to bottom
   const bottom = window.innerHeight - touch.clientY - 28

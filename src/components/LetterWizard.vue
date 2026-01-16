@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useLetterStore } from '../stores/letter'
 import { ref, computed } from 'vue'
-import { User, MapPin, Briefcase, FileText, ChevronRight, ChevronLeft, Home } from 'lucide-vue-next'
+import { User, MapPin, Briefcase, FileText, ChevronRight, ChevronLeft, Home, Banknote, FileX, Coins, Hammer, Lightbulb, DoorOpen, AlertTriangle, Zap } from 'lucide-vue-next'
 
 const store = useLetterStore()
 const currentStep = ref(1)
@@ -15,17 +15,29 @@ const steps = computed(() => [
 ])
 
 // Date & Amount Validation
-const dateErrors = ref<{ leaseStart?: string, leaseEnd?: string }>({})
-const amountErrors = ref<{ rentAmount?: string, depositAmount?: string }>({})
+const dateErrors = ref<{ 
+  leaseStart?: string, 
+  leaseEnd?: string,
+  repairNotifyDate?: string,
+  moveOutDate?: string,
+  arrearsStart?: string,
+  evictionDeadline?: string,
+  intrusionDate?: string
+}>({})
+const amountErrors = ref<{ 
+  rentAmount?: string, 
+  depositAmount?: string,
+  arrearsTotal?: string
+}>({})
 
-const hasErrors = computed(() => !!(
+const step2HasErrors = computed(() => !!(
   dateErrors.value.leaseStart || 
   dateErrors.value.leaseEnd ||
   amountErrors.value.rentAmount ||
   amountErrors.value.depositAmount
 ))
 
-const validateAmount = (field: 'rentAmount' | 'depositAmount') => {
+const validateAmount = (field: 'rentAmount' | 'depositAmount' | 'arrearsTotal') => {
   if (!store[field]) {
     amountErrors.value[field] = '請輸入金額'
     return
@@ -43,13 +55,16 @@ const next = () => {
     validateDate('leaseEnd')
     validateAmount('rentAmount')
     validateAmount('depositAmount')
-    if (hasErrors.value) return
+    if (step2HasErrors.value) return
   }
+  // Step 3 validation is optional/soft or strictly enforced? 
+  // User didn't ask for strict blocking on Step 3, but if they enter bad data we should flag it.
+  // We can leave blocking off for step 3 for now, or just validate if they entered something.
   currentStep.value++
 }
 const prev = () => currentStep.value--
 
-const validateDate = (field: 'leaseStart' | 'leaseEnd') => {
+const validateDate = (field: 'leaseStart' | 'leaseEnd' | 'repairNotifyDate' | 'moveOutDate' | 'arrearsStart' | 'evictionDeadline' | 'intrusionDate') => {
   const val = store[field]
   if (!val) {
     dateErrors.value[field] = '請輸入日期'
@@ -110,7 +125,7 @@ const validateDate = (field: 'leaseStart' | 'leaseEnd') => {
   delete dateErrors.value[field]
 }
 
-const handleDateInput = (event: Event, field: 'leaseStart' | 'leaseEnd') => {
+const handleDateInput = (event: Event, field: 'leaseStart' | 'leaseEnd' | 'repairNotifyDate' | 'moveOutDate' | 'arrearsStart' | 'evictionDeadline' | 'intrusionDate') => {
   const input = event.target as HTMLInputElement
   const inputType = (event as InputEvent).inputType
   const isDeleting = inputType && inputType.startsWith('delete')
@@ -146,9 +161,9 @@ const handleDateInput = (event: Event, field: 'leaseStart' | 'leaseEnd') => {
     <div class="mb-2 shrink-0">
       <button 
         @click="$emit('home')" 
-        class="mb-2 px-3 py-2 -ml-3 text-slate-500 hover:text-legal-navy hover:bg-slate-50 rounded-lg flex items-center text-sm font-medium transition-all group"
+        class="mb-2 px-4 py-2 -ml-2 text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center text-sm font-medium transition-all group"
       >
-         <Home class="w-4 h-4 mr-1 group-hover:-translate-x-1 transition-transform" /> 回首頁
+         <Home class="w-4 h-4 mr-2" /> 回首頁
       </button>
 
       <div class="flex items-center justify-between mb-2">
@@ -177,21 +192,63 @@ const handleDateInput = (event: Event, field: 'leaseStart' | 'leaseEnd') => {
       <div v-if="currentStep === 1" class="space-y-8 animate-fade-in-up">
         
         <!-- Category Selection (Only for Letter) -->
-        <div v-if="store.documentType === 'letter'" class="space-y-2">
+        <div v-if="store.documentType === 'letter'" class="space-y-3">
           <h3 class="text-lg font-semibold text-slate-800 flex items-center">
             <Briefcase class="w-5 h-5 mr-2 text-legal-navy" /> 案件類型
           </h3>
-          <div class="relative">
-             <select v-model="store.category" class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 focus:border-legal-navy outline-none appearance-none cursor-pointer font-medium text-lg">
-              <option>租金欠繳</option>
-              <option>提前解約</option>
-              <option>押金返還</option>
-              <option>修繕責任</option>
-            </select>
-            <div class="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none">
-              <span class="text-slate-400">▼</span>
-            </div>
+          <div class="grid grid-cols-2 gap-4">
+            <template v-if="store.userRole === 'landlord'">
+              <button
+                 v-for="cat in [
+                   { label: '欠繳租金', icon: Banknote, desc: '催告給付欠租' },
+                   { label: '租約終止', icon: DoorOpen, desc: '租期屆滿/遷讓' },
+                   { label: '損害賠償', icon: Hammer, desc: '房屋損壞求償' },
+                   { label: '違約行為', icon: AlertTriangle, desc: '轉租/寵物/違法' }
+                 ]"
+                 :key="cat.label"
+                 @click="store.category = cat.label"
+                 :class="[
+                   'relative flex flex-col items-center justify-center p-5 rounded-xl border-2 transition-all duration-200 group overflow-hidden text-center h-full w-full aspect-square',
+                   store.category === cat.label
+                     ? 'border-legal-navy bg-blue-50/50 text-legal-navy shadow-md scale-[1.02] z-10'
+                     : 'border-slate-100 bg-white text-slate-500 hover:border-slate-200 hover:bg-slate-50'
+                 ]"
+              >
+                 <div :class="['p-3 rounded-full mb-3 transition-colors', store.category === cat.label ? 'bg-white' : 'bg-slate-100 group-hover:bg-slate-200']">
+                   <component :is="cat.icon" class="w-8 h-8" />
+                 </div>
+                 <span class="font-bold text-sm block mb-1">{{ cat.label }}</span>
+                 <span class="text-[11px] leading-tight opacity-70 block">{{ cat.desc }}</span>
+                 <div v-if="store.category === cat.label" class="absolute top-3 right-3 w-2.5 h-2.5 rounded-full bg-legal-navy"></div>
+              </button>
+            </template>
+            <template v-else>
+               <button
+                 v-for="cat in [
+                   { label: '押金返還', icon: Coins, desc: '請求返還押金' },
+                   { label: '修繕責任', icon: Hammer, desc: '要求履行修繕' },
+                   { label: '提前解約', icon: FileX, desc: '終止租賃契約' },
+                   { label: '居住安寧', icon: Zap, desc: '房東擅闖/干擾' }
+                 ]"
+                 :key="cat.label"
+                 @click="store.category = cat.label"
+                 :class="[
+                   'relative flex flex-col items-center justify-center p-5 rounded-xl border-2 transition-all duration-200 group overflow-hidden text-center h-full w-full aspect-square',
+                   store.category === cat.label
+                     ? 'border-legal-navy bg-blue-50/50 text-legal-navy shadow-md scale-[1.02] z-10'
+                     : 'border-slate-100 bg-white text-slate-500 hover:border-slate-200 hover:bg-slate-50'
+                 ]"
+              >
+                 <div :class="['p-3 rounded-full mb-3 transition-colors', store.category === cat.label ? 'bg-white' : 'bg-slate-100 group-hover:bg-slate-200']">
+                   <component :is="cat.icon" class="w-8 h-8" />
+                 </div>
+                 <span class="font-bold text-sm block mb-1">{{ cat.label }}</span>
+                 <span class="text-[11px] leading-tight opacity-70 block">{{ cat.desc }}</span>
+                 <div v-if="store.category === cat.label" class="absolute top-3 right-3 w-2.5 h-2.5 rounded-full bg-legal-navy"></div>
+              </button>
+            </template>
           </div>
+
         </div>
         
         <hr v-if="store.documentType === 'letter'" class="border-slate-100" />
@@ -318,16 +375,208 @@ const handleDateInput = (event: Event, field: 'leaseStart' | 'leaseEnd') => {
 
       <!-- Step 3: Additional Facts -->
       <div v-if="currentStep === 3" class="space-y-6 animate-fade-in-up">
-        <h3 class="text-lg font-semibold text-slate-800">補充說明 / 爭議詳情</h3>
-        <div class="bg-blue-50 p-4 rounded-lg text-sm text-blue-800">
-           {{ store.documentType === 'contract' ? '💡 您可在此新增其他約定條款（如：不可轉租、寵物條款等）。' : '💡 系統已根據前述資料自動生成第一段。您可在此補充：「積欠月份」、「具體修繕項目」或「違約情事」。' }}
+        
+        <!-- Legal Insight Banner -->
+        <div class="bg-blue-50 p-4 rounded-xl border border-blue-100 flex items-start gap-3">
+          <Lightbulb class="w-5 h-5 text-legal-navy shrink-0 mt-0.5" />
+          <div class="text-sm text-blue-900 leading-relaxed">
+             <template v-if="store.documentType === 'letter'">
+               <p v-if="store.category === '欠繳租金'"><strong>民法第440條：</strong>承租人租金支付有遲延者，出租人得定相當期限，催告承租人支付租金，如承租人於其期限內不為支付，出租人得終止契約。</p>
+               <p v-if="store.category === '租約終止'"><strong>民法第450條/455條：</strong>租賃定有期限者，其租賃關係，於期限屆滿時消滅...租賃關係消滅後，承租人應返還租賃物。</p>
+               <p v-if="store.category === '損害賠償'"><strong>民法第432條：</strong>承租人應以善良管理人之注意，保管租賃物。租賃物有生產力者，並應保持其生產狀態。承租人違反前項義務，致租賃物毀損、滅失者，負損害賠償責任。</p>
+               <p v-if="store.category === '違約行為'"><strong>民法第438條：</strong>承租人應依約定方法，為租賃物之使用、收益...承租人違反規定...經出租人阻止而仍繼續為之者，出租人得終止契約。</p>
+               
+               <p v-if="store.category === '押金返還'"><strong>民法第448條：</strong>租賃關係消滅時，承租人於返還租賃物後，得請求出租人返還押金。</p>
+               <p v-if="store.category === '修繕責任'"><strong>民法第423條/429條：</strong>出租人應保持租賃物合於約定使用狀態...租賃物之修繕，除契約另有訂定或另有習慣外，由出租人負擔。</p>
+               <p v-if="store.category === '提前解約'"><strong>民法第450條/453條：</strong>未定期限者，各當事人得隨時終止契約...定有期限者，如約定當事人之一方於期限屆滿前，得終止契約者，其終止契約，應先期通知。</p>
+               <p v-if="store.category === '居住安寧'"><strong>刑法第306條：</strong>無故侵入他人住宅、建築物或附連圍繞之土地或船艦者，處一年以下有期徒刑、拘役或九千元以下罰金。</p>
+             </template>
+             <p v-if="store.documentType === 'contract'"><strong>租約小提醒：</strong>請務必確認租賃期間、租金及押金金額，並載明修繕責任歸屬。</p>
+          </div>
         </div>
-        <textarea 
-          v-model="store.facts" 
-          rows="12" 
-          class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:border-legal-navy focus:ring-2 focus:ring-legal-navy/20 transition-all outline-none resize-none"
-          :placeholder="store.documentType === 'contract' ? '例如：乙方不得將房屋轉租於他人...' : '例如：台端自民國113年5月起即未按時繳納租金，經多次催告仍不履行......'"
-        ></textarea>
+
+        <h3 class="text-lg font-semibold text-slate-800">事實經過與補充</h3>
+        
+        <!-- Structured Inputs for Letter -->
+        <div v-if="store.documentType === 'letter'" class="bg-slate-50 p-4 rounded-xl border border-slate-100 space-y-4">
+           <!-- Arrears (Banknote) -->
+           <div v-if="store.category === '欠繳租金'" class="space-y-3">
+             <h4 class="font-medium text-slate-700 text-sm">欠租明細</h4>
+             <div class="grid grid-cols-2 gap-3">
+               <div>
+                  <label class="text-xs text-slate-500 mb-1 block">欠租起始年月</label>
+                  <input 
+                    v-model="store.arrearsStart" 
+                    @blur="validateDate('arrearsStart')"
+                    @input="(e) => handleDateInput(e, 'arrearsStart')"
+                    type="text" 
+                    placeholder="例：112/05" 
+                    :class="['w-full px-3 py-2 rounded-lg border text-sm outline-none transition-colors bg-white text-slate-900', dateErrors.arrearsStart ? 'border-red-300 focus:border-red-500' : 'border-slate-200 focus:border-legal-navy']"
+                  />
+                  <p v-if="dateErrors.arrearsStart" class="text-xs text-red-500 mt-1">{{ dateErrors.arrearsStart }}</p>
+               </div>
+               <div>
+                  <label class="text-xs text-slate-500 mb-1 block">欠租月數</label>
+                  <input v-model="store.arrearsCount" type="number" placeholder="例：3" class="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:border-legal-navy outline-none transition-colors bg-white text-slate-900" />
+               </div>
+               <div class="col-span-2">
+                  <label class="text-xs text-slate-500 mb-1 block">欠租總金額</label>
+                  <input 
+                    v-model="store.arrearsTotal" 
+                    @blur="validateAmount('arrearsTotal')"
+                    type="number" 
+                    placeholder="例：45000" 
+                    :class="['w-full px-3 py-2 rounded-lg border text-sm outline-none transition-colors bg-white text-slate-900', amountErrors.arrearsTotal ? 'border-red-300 focus:border-red-500' : 'border-slate-200 focus:border-legal-navy']" 
+                  />
+                  <p v-if="amountErrors.arrearsTotal" class="text-xs text-red-500 mt-1">{{ amountErrors.arrearsTotal }}</p>
+               </div>
+             </div>
+           </div>
+
+           <!-- Eviction (DoorOpen) -->
+           <div v-if="store.category === '租約終止'" class="space-y-3">
+             <h4 class="font-medium text-slate-700 text-sm">終止詳情</h4>
+             <div>
+                <label class="text-xs text-slate-500 mb-1 block">限期遷讓日期</label>
+                <input 
+                  v-model="store.evictionDeadline" 
+                  @blur="validateDate('evictionDeadline')"
+                  @input="(e) => handleDateInput(e, 'evictionDeadline')"
+                  type="text" 
+                  placeholder="例：112/12/31" 
+                  class="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:border-legal-navy outline-none transition-colors bg-white text-slate-900" 
+                />
+             </div>
+           </div>
+
+           <!-- Damages (Hammer) -->
+           <div v-if="store.category === '損害賠償'" class="space-y-3">
+             <h4 class="font-medium text-slate-700 text-sm">損害情形</h4>
+             <div class="space-y-3">
+               <div>
+                  <label class="text-xs text-slate-500 mb-1 block">損壞項目</label>
+                  <input v-model="store.repairItem" type="text" placeholder="例：客廳地板、浴室門" class="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:border-legal-navy outline-none transition-colors bg-white text-slate-900" />
+               </div>
+               <div>
+                  <label class="text-xs text-slate-500 mb-1 block">預估修復/賠償金額</label>
+                  <input v-model="store.arrearsTotal" type="number" placeholder="例：5000" class="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:border-legal-navy outline-none transition-colors bg-white text-slate-900" />
+               </div>
+             </div>
+           </div>
+           
+           <!-- Breach (AlertTriangle) -->
+           <div v-if="store.category === '違約行為'" class="space-y-3">
+             <h4 class="font-medium text-slate-700 text-sm">違約詳情</h4>
+             <div>
+                <label class="text-xs text-slate-500 mb-1 block">違約事由</label>
+                <input v-model="store.breachDetails" type="text" placeholder="例：未經同意飼養寵物、違法轉租" class="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:border-legal-navy outline-none transition-colors bg-white text-slate-900" />
+             </div>
+           </div>
+
+           <!-- Repairs (Hammer) - Tenant -->
+           <div v-if="store.category === '修繕責任'" class="space-y-3">
+             <h4 class="font-medium text-slate-700 text-sm">損壞情形</h4>
+             <div class="grid grid-cols-2 gap-3">
+               <div class="col-span-2">
+                  <label class="text-xs text-slate-500 mb-1 block">待修繕項目</label>
+                  <input v-model="store.repairItem" type="text" placeholder="例：浴室熱水器、臥室冷氣" class="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:border-legal-navy outline-none transition-colors bg-white text-slate-900" />
+               </div>
+               <div class="col-span-2">
+                  <label class="text-xs text-slate-500 mb-1 block">已通知房東日期</label>
+                  <input 
+                    v-model="store.repairNotifyDate" 
+                    @blur="validateDate('repairNotifyDate')"
+                    @input="(e) => handleDateInput(e, 'repairNotifyDate')"
+                    type="text" 
+                    placeholder="例：112/03/15" 
+                    :class="['w-full px-3 py-2 rounded-lg border text-sm outline-none transition-colors bg-white text-slate-900', dateErrors.repairNotifyDate ? 'border-red-300 focus:border-red-500' : 'border-slate-200 focus:border-legal-navy']"  
+                  />
+                  <p v-if="dateErrors.repairNotifyDate" class="text-xs text-red-500 mt-1">{{ dateErrors.repairNotifyDate }}</p>
+               </div>
+             </div>
+           </div>
+           
+           <!-- Intrusion (Zap) - Tenant -->
+           <div v-if="store.category === '居住安寧'" class="space-y-3">
+             <h4 class="font-medium text-slate-700 text-sm">妨害詳情</h4>
+             <div>
+                <label class="text-xs text-slate-500 mb-1 block">發生日期</label>
+                <input 
+                  v-model="store.intrusionDate" 
+                  @blur="validateDate('intrusionDate')"
+                  @input="(e) => handleDateInput(e, 'intrusionDate')"
+                  type="text" 
+                  placeholder="例：112/08/20" 
+                  class="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:border-legal-navy outline-none transition-colors bg-white text-slate-900"  
+                />
+             </div>
+           </div>
+           
+           <!-- Deposit (Coins) - Tenant -->
+           <div v-if="store.category === '押金返還'" class="space-y-3">
+             <h4 class="font-medium text-slate-700 text-sm">搬離資訊</h4>
+             <div class="grid grid-cols-2 gap-3">
+               <div>
+                  <label class="text-xs text-slate-500 mb-1 block">搬離/點交日期</label>
+                  <input 
+                    v-model="store.moveOutDate" 
+                    @blur="validateDate('moveOutDate')"
+                    @input="(e) => handleDateInput(e, 'moveOutDate')"
+                    type="text" 
+                    placeholder="例：112/06/30" 
+                    :class="['w-full px-3 py-2 rounded-lg border text-sm outline-none transition-colors bg-white text-slate-900', dateErrors.moveOutDate ? 'border-red-300 focus:border-red-500' : 'border-slate-200 focus:border-legal-navy']"  
+                  />
+                  <p v-if="dateErrors.moveOutDate" class="text-xs text-red-500 mt-1">{{ dateErrors.moveOutDate }}</p>
+               </div>
+               <div>
+                  <label class="text-xs text-slate-500 mb-1 block">押金金額</label>
+                  <input v-model="store.depositAmount" type="number" placeholder="例：30000" class="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:border-legal-navy outline-none transition-colors bg-white text-slate-900" />
+               </div>
+             </div>
+           </div>
+           
+           <!-- Early Termination (FileX) - Tenant -->
+           <div v-if="store.category === '提前解約'" class="space-y-3">
+             <h4 class="font-medium text-slate-700 text-sm">解約規劃</h4>
+             <div>
+                <label class="text-xs text-slate-500 mb-1 block">預計終止/搬離日期</label>
+                <input 
+                  v-model="store.moveOutDate" 
+                  @blur="validateDate('moveOutDate')"
+                  @input="(e) => handleDateInput(e, 'moveOutDate')"
+                  type="text" 
+                  placeholder="例：112/09/30" 
+                  class="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:border-legal-navy outline-none transition-colors bg-white text-slate-900"  
+                />
+             </div>
+           </div>
+        </div>
+
+        <div class="relative">
+          <textarea 
+            v-model="store.facts" 
+            rows="8" 
+            class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:border-legal-navy focus:ring-2 focus:ring-legal-navy/20 transition-all outline-none resize-none"
+            :placeholder="store.documentType === 'contract' ? '例如：乙方不得將房屋轉租於他人...' : '請填寫其他補充事項（上方欄位已填寫者無需重複）...'"
+          ></textarea>
+          
+          <!-- Quick Phrases -->
+          <div v-if="store.documentType === 'letter'" class="mt-3 flex flex-wrap gap-2">
+            <span class="text-xs text-slate-400 font-medium self-center mr-1">快速插入：</span>
+            <button 
+              v-for="phrase in [
+                '經多次電話聯絡未果',
+                '已寄發簡訊通知',
+                '請於期限內回覆',
+                '嚴重影響居住品質'
+              ]"
+              @click="store.facts += (store.facts ? '\n' : '') + phrase"
+              class="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs rounded-full transition-colors flex items-center"
+            >
+              <span class="mr-1 text-slate-400">+</span> {{ phrase }}
+            </button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -338,7 +587,7 @@ const handleDateInput = (event: Event, field: 'leaseStart' | 'leaseEnd') => {
         v-if="currentStep > 1" 
         @click="prev"
         type="button"
-        class="px-6 py-2 text-slate-600 font-medium hover:text-legal-navy flex items-center transition-colors hover:bg-slate-50 rounded-lg group"
+        class="px-6 py-2 bg-slate-100 text-slate-600 font-medium hover:bg-slate-200 hover:text-slate-800 flex items-center transition-colors rounded-lg group"
       >
         <ChevronLeft class="w-4 h-4 mr-1 group-hover:-translate-x-1 transition-transform" /> 上一步
       </button>
@@ -348,10 +597,10 @@ const handleDateInput = (event: Event, field: 'leaseStart' | 'leaseEnd') => {
         v-if="currentStep < steps.length" 
         @click="next"
         type="button"
-        :disabled="currentStep === 2 && hasErrors"
+        :disabled="currentStep === 2 && step2HasErrors"
         :class="[
           'px-8 py-3 rounded-xl shadow-lg transition-all flex items-center transform',
-          (currentStep === 2 && hasErrors)
+          (currentStep === 2 && step2HasErrors)
             ? 'bg-slate-300 text-slate-500 cursor-not-allowed shadow-none'
             : 'bg-legal-navy text-white shadow-legal-navy/30 hover:bg-blue-900 hover:-translate-y-0.5'
         ]"
