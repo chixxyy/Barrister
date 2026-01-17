@@ -115,7 +115,6 @@ const handleFabClick = () => {
         </div>
 
         <!-- Mobile Preview FAB -->
-        <!-- Mobile Preview FAB -->
         <button 
           @click="handleFabClick"
           @touchstart="handleTouchStart"

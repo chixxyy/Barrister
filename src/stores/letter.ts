@@ -8,16 +8,14 @@ export const useLetterStore = defineStore('letter', () => {
   const documentType = ref<'letter' | 'contract'>('letter')
   const category = ref<string>('欠繳租金')
   
-  // Lease specific details
+  // Lease details
   const propertyAddress = ref('')
   const leaseStart = ref('')
   const leaseEnd = ref('')
   const rentAmount = ref('')
   const depositAmount = ref('')
-  
 
-  
-  // Specific Fact Fields
+  // Fact Fields
   const arrearsStart = ref('') // 欠租開始月份
   const arrearsCount = ref('') // 欠租月數
   const arrearsTotal = ref('') // 欠租總額
@@ -103,7 +101,6 @@ ${basicArticles}${otherArticle}
 第${courtArticleNum}條：管轄法院
 本契約如涉訴訟，雙方同意以租賃物所在地之地方法院為第一審管轄法院。
 
-
 立契約書人
 甲方：${partyA.name || '___________'}
 身分證字號：${partyA.idNumber || '___________'}
@@ -136,7 +133,6 @@ ${basicArticles}${otherArticle}
 
     // Auto-generate fact paragraph from structured data
     let structuredFacts = ''
-    // pAddress already defined above
     
     if (startStr && endStr) {
       structuredFacts += `\n一、緣本人與台端就位於「${pAddress}」之房屋訂有租賃契約，租期自 ${startStr} 起至 ${endStr} 止`

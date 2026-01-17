@@ -6,8 +6,6 @@ import { User, MapPin, Briefcase, FileText, ChevronRight, ChevronLeft, Home, Ban
 const store = useLetterStore()
 const currentStep = ref(1)
 
-
-
 const steps = computed(() => [
   { id: 1, title: '基本資料', icon: User },
   { id: 2, title: store.documentType === 'contract' ? '合約細節' : '租約背景', icon: Briefcase },
@@ -57,9 +55,7 @@ const next = () => {
     validateAmount('depositAmount')
     if (step2HasErrors.value) return
   }
-  // Step 3 validation is optional/soft or strictly enforced? 
-  // User didn't ask for strict blocking on Step 3, but if they enter bad data we should flag it.
-  // We can leave blocking off for step 3 for now, or just validate if they entered something.
+
   currentStep.value++
 }
 const prev = () => currentStep.value--
@@ -597,7 +593,6 @@ const printPDF = () => {
       </div>
     </div>
 
-    <!-- Navigation Footer -->
     <!-- Navigation Footer -->
     <div class="flex justify-between pt-8 shrink-0 mt-auto bg-white border-t border-slate-50 sticky bottom-0 z-50">
       <button 
