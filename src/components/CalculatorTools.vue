@@ -13,9 +13,11 @@ const subsidyCities = [
   { value: 'taipei', label: '台北市' },
   { value: 'new_taipei', label: '新北市' },
   { value: 'taoyuan', label: '桃園市' },
+  { value: 'hsinchu', label: '新竹縣市' },
   { value: 'taichung', label: '台中市' },
   { value: 'tainan', label: '台南市' },
-  { value: 'kaohsiung', label: '高雄市' }
+  { value: 'kaohsiung', label: '高雄市' },
+  { value: 'other', label: '其他縣市' }
 ]
 
 const subsidyIdentities = [
@@ -28,11 +30,13 @@ const subsidyIdentities = [
 // Format: { city: [Tier 1, Tier 2, Tier 3] }
 const subsidyData: Record<string, number[]> = {
   'taipei': [8000, 5000, 3000],
-  'new_taipei': [4800, 3200, 2400], // Using Banqiao/Sanchong/etc tier
+  'new_taipei': [4800, 3200, 2400], 
   'taoyuan': [4000, 3200, 2400],
-  'taichung': [4000, 3200, 2400], // Central districts
+  'hsinchu': [4000, 3200, 2400],
+  'taichung': [4000, 3200, 2400], 
   'tainan': [3200, 3200, 2200],
-  'kaohsiung': [3200, 3200, 2200]
+  'kaohsiung': [3200, 3200, 2200],
+  'other': [3200, 3200, 2000] // Standard rate for other counties
 }
 
 const subsidyResult = computed(() => {
