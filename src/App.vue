@@ -99,7 +99,7 @@ const handleFabClick = () => {
     <!-- PDF Source (Off-screen but visible for generation) -->
     <div class="fixed left-[-9999px] top-0 overflow-visible no-print" aria-hidden="true">
        <div id="pdf-content-source" class="w-[210mm] min-h-[297mm] bg-white">
-          <LetterPreview />
+          <LetterPreview hide-shadow />
        </div>
     </div>
 

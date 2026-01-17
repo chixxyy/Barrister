@@ -158,8 +158,15 @@ const emit = defineEmits(['home', 'download'])
 
 // ... (existing code)
 
-const printPDF = () => {
+const showConfirmModal = ref(false)
+
+const confirmDownload = () => {
+  showConfirmModal.value = false
   emit('download')
+}
+
+const printPDF = () => {
+  showConfirmModal.value = true
 }
 </script>
 
@@ -273,6 +280,7 @@ const printPDF = () => {
           </h3>
           <div class="grid grid-cols-1 gap-3">
              <input v-model="store.sender.name" type="text" :placeholder="store.documentType === 'contract' ? (store.userRole === 'landlord' ? '甲方姓名' : '乙方姓名') : '姓名 / 公司名稱'" class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:border-legal-navy focus:ring-2 focus:ring-legal-navy/20 transition-all outline-none" />
+             <input v-model="store.sender.idNumber" type="text" :placeholder="store.documentType === 'contract' ? (store.userRole === 'landlord' ? '甲方身分證字號' : '乙方身分證字號') : '身分證字號 (選填)'" class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:border-legal-navy focus:ring-2 focus:ring-legal-navy/20 transition-all outline-none" />
              <input v-model="store.sender.address" type="text" :placeholder="store.documentType === 'contract' ? (store.userRole === 'landlord' ? '甲方戶籍地址' : '乙方戶籍地址') : '聯絡地址'" class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:border-legal-navy focus:ring-2 focus:ring-legal-navy/20 transition-all outline-none" />
           </div>
         </div>
@@ -289,6 +297,7 @@ const printPDF = () => {
           </h3>
           <div class="grid grid-cols-1 gap-3">
              <input v-model="store.receiver.name" type="text" :placeholder="store.documentType === 'contract' ? (store.userRole === 'landlord' ? '乙方姓名' : '甲方姓名') : '對方姓名'" class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:border-legal-navy focus:ring-2 focus:ring-legal-navy/20 transition-all outline-none" />
+             <input v-model="store.receiver.idNumber" type="text" :placeholder="store.documentType === 'contract' ? (store.userRole === 'landlord' ? '乙方身分證字號' : '甲方身分證字號') : '對方身分證字號 (選填)'" class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:border-legal-navy focus:ring-2 focus:ring-legal-navy/20 transition-all outline-none" />
              <input v-model="store.receiver.address" type="text" :placeholder="store.documentType === 'contract' ? (store.userRole === 'landlord' ? '乙方戶籍地址' : '甲方戶籍地址') : '對方地址'" class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:border-legal-navy focus:ring-2 focus:ring-legal-navy/20 transition-all outline-none" />
           </div>
         </div>
@@ -625,6 +634,36 @@ const printPDF = () => {
       </button>
     </div>
   </div>
+
+
+  <!-- Confirmation Modal -->
+  <div v-if="showConfirmModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-fade-in">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden transform transition-all animate-scale-up">
+      <div class="p-6 text-center space-y-4">
+        <div class="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-2 ring-4 ring-green-50/50">
+          <FileText class="w-8 h-8 text-green-600" />
+        </div>
+        <h3 class="text-xl font-bold text-slate-800">確認下載文件？</h3>
+        <p class="text-slate-500 text-sm leading-relaxed">
+          系統將為您產生 PDF 檔案。<br>請確認目前填寫的內容皆正確無誤。
+        </p>
+      </div>
+      <div class="grid grid-cols-2 gap-px bg-slate-100 border-t border-slate-100">
+        <button 
+          @click="showConfirmModal = false"
+          class="py-4 text-slate-600 font-medium hover:bg-slate-50 transition-colors bg-white active:bg-slate-100"
+        >
+          再檢查一下
+        </button>
+        <button 
+          @click="confirmDownload"
+          class="py-4 text-green-600 font-bold hover:bg-green-50 transition-colors bg-white active:bg-green-100"
+        >
+          確認下載
+        </button>
+      </div>
+    </div>
+  </div>
 </template>
 
 <style scoped>
@@ -634,5 +673,21 @@ const printPDF = () => {
 @keyframes fadeInUp {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.2s ease-out;
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-scale-up {
+  animation: scaleUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes scaleUp {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
 }
 </style>

@@ -2,8 +2,8 @@ import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 
 export const useLetterStore = defineStore('letter', () => {
-  const sender = ref({ name: '', address: '' })
-  const receiver = ref({ name: '', address: '' })
+  const sender = ref({ name: '', address: '', idNumber: '' })
+  const receiver = ref({ name: '', address: '', idNumber: '' })
   const userRole = ref<'landlord' | 'tenant'>('landlord')
   const documentType = ref<'letter' | 'contract'>('letter')
   const category = ref<string>('欠繳租金')
@@ -103,11 +103,14 @@ ${basicArticles}${otherArticle}
 第${courtArticleNum}條：管轄法院
 本契約如涉訴訟，雙方同意以租賃物所在地之地方法院為第一審管轄法院。
 
+
 立契約書人
 甲方：${partyA.name || '___________'}
+身分證字號：${partyA.idNumber || '___________'}
 地址：${partyA.address || '____________________'}
 
 乙方：${partyB.name || '___________'}
+身分證字號：${partyB.idNumber || '___________'}
 地址：${partyB.address || '____________________'}
 
 中華民國 ${year} 年 ${now.getMonth() + 1} 月 ${now.getDate()} 日`

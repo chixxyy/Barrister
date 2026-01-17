@@ -2,13 +2,18 @@
 import { useLetterStore } from '../stores/letter'
 
 const store = useLetterStore()
+defineProps<{ hideShadow?: boolean }>()
 </script>
 
 <template>
-  <div class="relative w-full flex justify-center py-8">
-    <div class="paper-shadow bg-white relative w-[210mm] min-h-[297mm] overflow-hidden shrink-0">
-      <!-- Taiwan Post Attest Letter Grid Background -->
-      <!-- Green grids usually 20x20 squares? -->
+  <div 
+    :class="[
+      'bg-white relative w-[210mm] min-h-[297mm] overflow-hidden shrink-0 mx-auto',
+      { 'paper-shadow': !hideShadow }
+    ]"
+  >
+    <!-- Taiwan Post Attest Letter Grid Background -->
+    <!-- Green grids usually 20x20 squares? -->
       <div v-if="store.documentType === 'letter'" class="absolute inset-0 pointer-events-none" 
            style="background-image: 
               linear-gradient(0deg, transparent 23px, #eef7f2 24px),
@@ -26,9 +31,8 @@ const store = useLetterStore()
       </div>
 
       <!-- Content -->
-      <div class="relative z-10 px-[2.5cm] py-[2.5cm] h-full flex flex-col font-serif text-slate-900 leading-relaxed whitespace-pre-wrap text-[12pt]">
-        {{ store.generatedContent }}
-      </div>
+    <div class="relative z-10 px-[2.5cm] py-[2.5cm] h-full flex flex-col font-serif text-slate-900 leading-relaxed whitespace-pre-wrap text-[12pt]">
+      {{ store.generatedContent }}
     </div>
   </div>
 </template>
