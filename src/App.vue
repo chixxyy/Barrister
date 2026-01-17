@@ -12,6 +12,8 @@ const store = useLetterStore()
 const started = ref(false)
 const showPreview = ref(false)
 const previewScale = ref(1)
+const isGenerating = ref(false)
+
 
 const handleStart = (role: 'landlord' | 'tenant', type?: 'letter' | 'contract') => {
   store.userRole = role
@@ -39,19 +41,60 @@ const openPreview = () => {
   })
 }
 
-const handleDownload = () => {
+const handleDownload = async () => {
   const element = document.getElementById('pdf-content-source')
-  if (!element) return
+  if (!element || isGenerating.value) return
+
+  isGenerating.value = true
+  const filename = `${store.documentType === 'contract' ? '租賃契約' : '存證信函'}.pdf`
 
   const opt = {
     margin: 0,
-    filename: `${store.documentType === 'contract' ? '租賃契約' : '存證信函'}.pdf`,
+    filename: filename,
     image: { type: 'jpeg', quality: 0.98 },
     html2canvas: { scale: 2, useCORS: true },
     jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
   }
 
-  html2pdf().set(opt).from(element).save()
+  try {
+    // Generate Blob
+    const blob = await html2pdf().set(opt).from(element).output('blob')
+    
+    // Check if Web Share API is supported for files
+    // @ts-ignore
+    if (navigator.share && navigator.canShare) {
+        const file = new File([blob], filename, { type: 'application/pdf' })
+        const shareData = {
+           files: [file],
+           title: filename,
+           text: '這是您的法律文件。'
+        }
+        
+        // @ts-ignore
+        if (navigator.canShare(shareData)) {
+           // @ts-ignore
+           await navigator.share(shareData)
+           isGenerating.value = false
+           return
+        }
+    }
+
+    // Fallback: Standard Download
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = filename
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
+
+  } catch (err) {
+    console.error('Download/Share failed:', err)
+    alert('產生文件失敗，請稍後再試。')
+  } finally {
+    isGenerating.value = false
+  }
 }
 
 // Mobile FAB Dragging Logic
@@ -110,7 +153,7 @@ const handleFabClick = () => {
         <!-- Left: Wizard -->
         <div class="w-full lg:w-[400px] xl:w-[450px] flex-shrink-0 h-full overflow-hidden border-r border-gray-200 bg-white shadow-2xl z-20 flex flex-col no-print">
           <div class="flex-1 overflow-hidden p-6 relative">
-             <LetterWizard @home="started = false" @download="handleDownload" />
+             <LetterWizard @home="started = false" @download="handleDownload" :is-generating="isGenerating" />
           </div>
         </div>
 

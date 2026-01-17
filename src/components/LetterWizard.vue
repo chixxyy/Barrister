@@ -5,7 +5,7 @@ import { User, MapPin, Briefcase, FileText, ChevronRight, ChevronLeft, Home, Ban
 
 const store = useLetterStore()
 const currentStep = ref(1)
-
+defineProps<{ isGenerating?: boolean }>()
 const steps = computed(() => [
   { id: 1, title: '基本資料', icon: User },
   { id: 2, title: store.documentType === 'contract' ? '合約細節' : '租約背景', icon: Briefcase },
@@ -625,7 +625,7 @@ const printPDF = () => {
         @click="printPDF"
         class="px-8 py-3 bg-green-600 text-white rounded-xl shadow-lg shadow-green-600/30 hover:bg-green-700 transition-all font-medium flex items-center transform hover:-translate-y-0.5"
       >
-         <FileText class="w-4 h-4 mr-2" /> {{ store.documentType === 'contract' ? '下載契約 PDF' : '下載信函 PDF' }}
+         <FileText class="w-4 h-4 mr-2" /> {{ store.documentType === 'contract' ? '儲存契約 PDF' : '儲存信函 PDF' }}
       </button>
     </div>
   </div>
@@ -652,9 +652,11 @@ const printPDF = () => {
         </button>
         <button 
           @click="confirmDownload"
-          class="py-4 text-green-600 font-bold hover:bg-green-50 transition-colors bg-white active:bg-green-100"
+          :disabled="isGenerating"
+          class="py-4 text-green-600 font-bold hover:bg-green-50 transition-colors bg-white active:bg-green-100 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
         >
-          確認下載
+          <span v-if="isGenerating" class="animate-spin mr-2 h-4 w-4 border-2 border-green-600 border-t-transparent rounded-full"></span>
+          {{ isGenerating ? '處理中...' : '確認儲存 / 分享' }}
         </button>
       </div>
     </div>
