@@ -56,6 +56,23 @@ const handleDownload = async () => {
     jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
   }
 
+  // Detect Desktop (>= 1024px) logic
+  const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 1024
+
+  if (isDesktop) {
+    // Desktop: Direct Download (Legacy behavior)
+    try {
+      await html2pdf().set(opt).from(element).save()
+    } catch (err) {
+      console.error('Download failed:', err)
+      alert('下載失敗，請稍後再試。')
+    } finally {
+      isGenerating.value = false
+    }
+    return
+  }
+
+  // Mobile: Blob + Share Sheet
   try {
     // Generate Blob
     const blob = await html2pdf().set(opt).from(element).output('blob')

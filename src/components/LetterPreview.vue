@@ -16,8 +16,8 @@ defineProps<{ hideShadow?: boolean }>()
     <!-- Green grids usually 20x20 squares? -->
       <div v-if="store.documentType === 'letter'" class="absolute inset-0 pointer-events-none" 
            style="background-image: 
-              linear-gradient(0deg, transparent 23px, #eef7f2 24px),
-              linear-gradient(90deg, transparent 23px, #eef7f2 24px);
+              linear-gradient(0deg, transparent 23px, #f8fcf9 24px),
+              linear-gradient(90deg, transparent 23px, #f8fcf9 24px);
               background-size: 24px 24px;">
       </div>
       
