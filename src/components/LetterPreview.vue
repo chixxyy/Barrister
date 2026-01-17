@@ -31,8 +31,12 @@ defineProps<{ hideShadow?: boolean }>()
       </div>
 
       <!-- Content -->
-    <div class="relative z-10 px-[2.5cm] py-[2.5cm] h-full flex flex-col font-serif text-slate-900 leading-relaxed whitespace-pre-wrap text-[12pt]">
-      {{ store.generatedContent }}
+    <div class="relative z-10 px-[2.5cm] py-[2.5cm] min-h-[297mm] flex flex-col font-serif text-slate-900 leading-relaxed text-[12pt]">
+      <div class="flex-1 whitespace-pre-wrap">{{ store.generatedContent }}</div>
+      
+      <div class="mt-12 pt-4 border-t border-slate-100/50 text-center text-[10px] text-slate-400 font-sans select-none">
+        免責聲明 (Disclaimer)：本工具生成之文件僅供參考，不代表律師正式法律意見
+      </div>
     </div>
   </div>
 </template>

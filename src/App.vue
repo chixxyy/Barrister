@@ -5,6 +5,8 @@ import LetterWizard from './components/LetterWizard.vue'
 import LetterPreview from './components/LetterPreview.vue'
 import { useLetterStore } from './stores/letter'
 import { Eye, X } from 'lucide-vue-next'
+import { Document, Packer, Paragraph, TextRun, AlignmentType } from 'docx'
+import { saveAs } from 'file-saver'
 // @ts-ignore
 import html2pdf from 'html2pdf.js'
 
@@ -114,6 +116,64 @@ const handleDownload = async () => {
   }
 }
 
+const handleDownloadWord = async () => {
+    if (isGenerating.value) return
+    isGenerating.value = true
+
+    try {
+        const lines = store.generatedContent.split('\n')
+        const children = lines.map(line => {
+             return new Paragraph({
+                 children: [
+                     new TextRun({
+                         text: line,
+                         font: 'BiauKai', // 標楷體
+                         size: 24, // 12pt = 24 half-points
+                     }),
+                 ],
+                 spacing: {
+                     after: 200, // standard styling
+                     line: 360, // standard line height
+                 }
+             })
+        })
+
+        children.push(
+            new Paragraph({
+                children: [
+                    new TextRun({
+                        text: "免責聲明 (Disclaimer)：本工具生成之文件僅供參考，不代表律師正式法律意見",
+                        font: 'BiauKai',
+                        size: 20, // 10pt
+                        color: "888888" 
+                    })
+                ],
+                spacing: {
+                    before: 800,
+                },
+                alignment: AlignmentType.CENTER
+            })
+        )
+
+        const doc = new Document({
+            sections: [{
+                properties: {},
+                children: children,
+            }],
+        })
+
+        const blob = await Packer.toBlob(doc)
+        const filename = `${store.documentType === 'contract' ? '租賃契約' : '存證信函'}.docx`
+        saveAs(blob, filename)
+        
+    } catch (err) {
+        console.error(err)
+        alert('Word 產生失敗')
+    } finally {
+        isGenerating.value = false
+    }
+}
+
 // Mobile FAB Dragging Logic
 const fabBottom = ref(24)
 const isDragging = ref(false)
@@ -170,7 +230,7 @@ const handleFabClick = () => {
         <!-- Left: Wizard -->
         <div class="w-full lg:w-[400px] xl:w-[450px] flex-shrink-0 h-full overflow-hidden border-r border-gray-200 bg-white shadow-2xl z-20 flex flex-col no-print">
           <div class="flex-1 overflow-hidden p-6 relative">
-             <LetterWizard @home="started = false" @download="handleDownload" :is-generating="isGenerating" />
+             <LetterWizard @home="started = false" @download="handleDownload" @download-word="handleDownloadWord" :is-generating="isGenerating" />
           </div>
         </div>
 

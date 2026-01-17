@@ -150,15 +150,19 @@ const handleDateInput = (event: Event, field: 'leaseStart' | 'leaseEnd' | 'repai
   store[field] = val
 }
 
-const emit = defineEmits(['home', 'download'])
+const emit = defineEmits(['home', 'download', 'download-word'])
 
 // ... (existing code)
 
 const showConfirmModal = ref(false)
 
-const confirmDownload = () => {
+const confirmDownload = (type: 'pdf' | 'word') => {
   showConfirmModal.value = false
-  emit('download')
+  if (type === 'word') {
+    emit('download-word')
+  } else {
+    emit('download')
+  }
 }
 
 const printPDF = () => {
@@ -638,25 +642,53 @@ const printPDF = () => {
         <div class="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-2 ring-4 ring-green-50/50">
           <FileText class="w-8 h-8 text-green-600" />
         </div>
-        <h3 class="text-xl font-bold text-slate-800">確認下載文件？</h3>
+        <h3 class="text-xl font-bold text-slate-800">選擇下載格式</h3>
         <p class="text-slate-500 text-sm leading-relaxed">
-          系統將為您產生 PDF 檔案。<br>請確認目前填寫的內容皆正確無誤。
+          請確認目前填寫的內容皆正確無誤。<br>PDF 適合列印/分享，Word 適合後續編輯。
         </p>
       </div>
-      <div class="grid grid-cols-2 gap-px bg-slate-100 border-t border-slate-100">
+      <div class="grid grid-cols-1 gap-px bg-slate-100 border-t border-slate-100">
+         <!-- PDF Option -->
+        <button 
+          @click="confirmDownload('pdf')"
+          :disabled="isGenerating"
+          class="py-4 px-6 text-left hover:bg-slate-50 transition-colors bg-white active:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed flex items-center group w-full"
+        >
+          <div class="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center mr-4 group-hover:bg-red-100 transition-colors shrink-0">
+             <FileText class="w-5 h-5 text-red-600" />
+          </div>
+          <div class="flex-1">
+             <div class="font-bold text-slate-800 flex items-center">
+               下載 PDF 檔
+               <span v-if="isGenerating" class="ml-2 text-xs font-normal text-slate-500 animate-pulse">處理中...</span>
+             </div>
+             <div class="text-xs text-slate-500">保留完整格式，適合直接列印或是分享</div>
+          </div>
+          <ChevronRight class="w-5 h-5 text-slate-300 group-hover:text-slate-500" />
+        </button>
+
+         <!-- Word Option -->
+        <button 
+          @click="confirmDownload('word')"
+          :disabled="isGenerating"
+          class="py-4 px-6 text-left hover:bg-slate-50 transition-colors bg-white active:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed flex items-center group w-full border-t border-slate-100"
+        >
+          <div class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center mr-4 group-hover:bg-blue-100 transition-colors shrink-0">
+             <FileText class="w-5 h-5 text-blue-600" />
+          </div>
+          <div class="flex-1">
+             <div class="font-bold text-slate-800">下載 Word 檔 (.docx)</div>
+             <div class="text-xs text-slate-500">可編輯內容，格式可能略有差異</div>
+          </div>
+          <ChevronRight class="w-5 h-5 text-slate-300 group-hover:text-slate-500" />
+        </button>
+
+        <!-- Cancel -->
         <button 
           @click="showConfirmModal = false"
-          class="py-4 text-slate-600 font-medium hover:bg-slate-50 transition-colors bg-white active:bg-slate-100"
+          class="py-3 text-slate-400 font-medium hover:text-slate-600 hover:bg-slate-50 transition-colors bg-white text-sm border-t border-slate-100"
         >
           再檢查一下
-        </button>
-        <button 
-          @click="confirmDownload"
-          :disabled="isGenerating"
-          class="py-4 text-green-600 font-bold hover:bg-green-50 transition-colors bg-white active:bg-green-100 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-        >
-          <span v-if="isGenerating" class="animate-spin mr-2 h-4 w-4 border-2 border-green-600 border-t-transparent rounded-full"></span>
-          {{ isGenerating ? '處理中...' : '確認儲存 / 分享' }}
         </button>
       </div>
     </div>
