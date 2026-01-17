@@ -5,6 +5,8 @@ import LetterWizard from './components/LetterWizard.vue'
 import LetterPreview from './components/LetterPreview.vue'
 import { useLetterStore } from './stores/letter'
 import { Eye, X } from 'lucide-vue-next'
+// @ts-ignore
+import html2pdf from 'html2pdf.js'
 
 const store = useLetterStore()
 const started = ref(false)
@@ -35,6 +37,21 @@ const openPreview = () => {
     const scale =  Math.min(availableWidth / targetWidth, 1)
     previewScale.value = scale
   })
+}
+
+const handleDownload = () => {
+  const element = document.getElementById('pdf-content-source')
+  if (!element) return
+
+  const opt = {
+    margin: 0,
+    filename: `${store.documentType === 'contract' ? '租賃契約' : '存證信函'}.pdf`,
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2, useCORS: true },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+  }
+
+  html2pdf().set(opt).from(element).save()
 }
 
 // Mobile FAB Dragging Logic
@@ -79,14 +96,21 @@ const handleFabClick = () => {
 
 <template>
   <main class="min-h-screen bg-gray-50 font-sans text-slate-800">
+    <!-- PDF Source (Off-screen but visible for generation) -->
+    <div class="fixed left-[-9999px] top-0 overflow-visible no-print" aria-hidden="true">
+       <div id="pdf-content-source" class="w-[210mm] min-h-[297mm] bg-white">
+          <LetterPreview />
+       </div>
+    </div>
+
     <transition name="fade" mode="out-in">
-      <HeroSection v-if="!started" @start="handleStart" />
+      <HeroSection v-if="!started" @start="handleStart" class="no-print" />
       
       <div v-else class="flex flex-col lg:flex-row h-screen overflow-hidden animate-slide-in relative">
         <!-- Left: Wizard -->
-        <div class="w-full lg:w-[400px] xl:w-[450px] flex-shrink-0 h-full overflow-hidden border-r border-gray-200 bg-white shadow-2xl z-20 flex flex-col">
+        <div class="w-full lg:w-[400px] xl:w-[450px] flex-shrink-0 h-full overflow-hidden border-r border-gray-200 bg-white shadow-2xl z-20 flex flex-col no-print">
           <div class="flex-1 overflow-hidden p-6 relative">
-             <LetterWizard @home="started = false" />
+             <LetterWizard @home="started = false" @download="handleDownload" />
           </div>
         </div>
 
@@ -98,7 +122,7 @@ const handleFabClick = () => {
           @touchmove.prevent="handleTouchMove"
           @touchend="handleTouchEnd"
           :style="{ bottom: `${fabBottom}px` }"
-          class="lg:hidden fixed right-6 w-14 h-14 bg-legal-navy text-white rounded-full shadow-xl z-30 flex items-center justify-center hover:bg-blue-900 transition-colors hover:scale-105 active:scale-95 touch-none"
+          class="lg:hidden fixed right-6 w-14 h-14 bg-legal-navy text-white rounded-full shadow-xl z-30 flex items-center justify-center hover:bg-blue-900 transition-colors hover:scale-105 active:scale-95 touch-none no-print"
           aria-label="預覽信函"
         >
           <div v-if="hasMoved" class="absolute inset-0 bg-black/10 rounded-full"></div>
@@ -108,7 +132,7 @@ const handleFabClick = () => {
         <!-- Mobile Preview Overlay (Modal) -->
         <div 
           v-if="showPreview"
-          class="lg:hidden fixed inset-0 z-50 bg-slate-100/95 backdrop-blur-sm flex flex-col animate-fade-in-up"
+          class="lg:hidden fixed inset-0 z-50 bg-slate-100/95 backdrop-blur-sm flex flex-col animate-fade-in-up no-print"
         >
            <!-- Header / Close Bar -->
            <div class="flex items-center justify-between p-4 bg-white border-b border-gray-200 shadow-sm shrink-0">
@@ -130,8 +154,8 @@ const handleFabClick = () => {
            </div>
         </div>
         
-        <!-- Desktop Preview (Always Visible on Desktop) -->
-        <div class="hidden lg:flex flex-1 h-full bg-slate-100/50 relative overflow-y-auto overflow-x-auto justify-center items-start p-8">
+        <!-- Desktop Preview (Visible on Desktop) -->
+        <div class="hidden lg:flex print-only flex-1 h-full bg-slate-100/50 relative overflow-y-auto overflow-x-auto justify-center items-start p-8">
            <LetterPreview />
         </div>
       </div>

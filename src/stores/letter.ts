@@ -72,6 +72,24 @@ export const useLetterStore = defineStore('letter', () => {
     const partyB = userRole.value === 'landlord' ? receiver.value : sender.value
 
     if (documentType.value === 'contract') {
+      const basicArticles = `第一條：租賃標的
+房屋所在地：${pAddress}
+
+第二條：租賃期間
+自 ${startStr || '______'} 起至 ${endStr || '______'} 止。
+
+第三條：租金及押金
+1. 每月租金新台幣 ${rentAmount.value || '______'} 元整，於每月 ___ 日前支付。
+2. 押金新台幣 ${depositAmount.value || '______'} 元整，於租期屆滿交還房屋時無息返還。`
+
+      let otherArticle = ''
+      let courtArticleNum = '四'
+      
+      if (facts.value?.trim()) {
+        otherArticle = `\n\n第四條：其他約定\n${facts.value}`
+        courtArticleNum = '五'
+      }
+
       return `住宅租賃契約書
 
 立契約書人：
@@ -80,20 +98,9 @@ export const useLetterStore = defineStore('letter', () => {
 
 茲為房屋租賃事宜，雙方同意本契約條款如下：
 
-第一條：租賃標的
-房屋所在地：${pAddress}
+${basicArticles}${otherArticle}
 
-第二條：租賃期間
-自 ${startStr || '______'} 起至 ${endStr || '______'} 止。
-
-第三條：租金及押金
-1. 每月租金新台幣 ${rentAmount.value || '______'} 元整，於每月 ___ 日前支付。
-2. 押金新台幣 ${depositAmount.value || '______'} 元整，於租期屆滿交還房屋時無息返還。
-
-第四條：其他約定
-${facts.value || '（無補充約定）'}
-
-第五條：管轄法院
+第${courtArticleNum}條：管轄法院
 本契約如涉訴訟，雙方同意以租賃物所在地之地方法院為第一審管轄法院。
 
 立契約書人
@@ -207,22 +214,24 @@ ${facts.value || '（無補充約定）'}
     // If no structured data but custom facts exist, use custom facts.
     
     let customFacts = ''
-    if (specificClaim && facts.value) {
+    const hasFacts = !!facts.value?.trim()
+    
+    if (specificClaim && hasFacts) {
       customFacts = `${specificClaim}\n\n三、${facts.value}`
     } else if (specificClaim) {
       customFacts = specificClaim
-    } else if (facts.value) {
+    } else if (hasFacts) {
       customFacts = `\n二、${facts.value}`
     } else {
-      customFacts = '\n二、台端之行為顯已違反契約義務及相關法規。'
+      customFacts = ''
     }
 
     // Dynamic numbering for the closing warning
     let closingNumber = '三'
-    if (specificClaim && facts.value) {
+    if (specificClaim && hasFacts) {
       // specificClaim is II, facts is III
       closingNumber = '四'
-    } else if (!specificClaim && facts.value) {
+    } else if (!specificClaim && hasFacts) {
       // facts is II
       closingNumber = '三'
     } else {
@@ -242,7 +251,7 @@ ${facts.value || '（無補充約定）'}
 主旨：${subject}
 
 說明：${structuredFacts}
-${customFacts || '\n二、台端之行為顯已違反契約義務及相關法規。'}
+${customFacts}
 
 ${closingNumber}、特函告知，請於文到後七日內出面處理或回覆，以免衍生不必要之訴訟程序。
 

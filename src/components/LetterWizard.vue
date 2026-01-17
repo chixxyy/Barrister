@@ -6,7 +6,7 @@ import { User, MapPin, Briefcase, FileText, ChevronRight, ChevronLeft, Home, Ban
 const store = useLetterStore()
 const currentStep = ref(1)
 
-defineEmits(['home'])
+
 
 const steps = computed(() => [
   { id: 1, title: '基本資料', icon: User },
@@ -152,6 +152,14 @@ const handleDateInput = (event: Event, field: 'leaseStart' | 'leaseEnd' | 'repai
   
   // Update store and input value
   store[field] = val
+}
+
+const emit = defineEmits(['home', 'download'])
+
+// ... (existing code)
+
+const printPDF = () => {
+  emit('download')
 }
 </script>
 
@@ -610,6 +618,7 @@ const handleDateInput = (event: Event, field: 'leaseStart' | 'leaseEnd' | 'repai
       <button 
         v-else 
         type="button"
+        @click="printPDF"
         class="px-8 py-3 bg-green-600 text-white rounded-xl shadow-lg shadow-green-600/30 hover:bg-green-700 transition-all font-medium flex items-center transform hover:-translate-y-0.5"
       >
          <FileText class="w-4 h-4 mr-2" /> {{ store.documentType === 'contract' ? '下載契約 PDF' : '下載信函 PDF' }}
