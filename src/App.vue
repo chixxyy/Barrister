@@ -10,8 +10,10 @@ import { saveAs } from 'file-saver'
 // @ts-ignore
 import html2pdf from 'html2pdf.js'
 
+import CalculatorTools from './components/CalculatorTools.vue'
+
 const store = useLetterStore()
-const started = ref(false)
+const currentView = ref<'hero' | 'wizard' | 'tools'>('hero')
 const showPreview = ref(false)
 const previewScale = ref(1)
 const isGenerating = ref(false)
@@ -28,7 +30,11 @@ const handleStart = (role: 'landlord' | 'tenant', type?: 'letter' | 'contract') 
     store.category = '押金返還'
   }
   
-  started.value = true
+  currentView.value = 'wizard'
+}
+
+const handleStartTools = () => {
+    currentView.value = 'tools'
 }
 
 const openPreview = () => {
@@ -224,13 +230,15 @@ const handleFabClick = () => {
     </div>
 
     <transition name="fade" mode="out-in">
-      <HeroSection v-if="!started" @start="handleStart" class="no-print" />
+      <HeroSection v-if="currentView === 'hero'" @start="handleStart" @start-tools="handleStartTools" class="no-print" />
       
+      <CalculatorTools v-else-if="currentView === 'tools'" @home="currentView = 'hero'" class="no-print" />
+
       <div v-else class="flex flex-col lg:flex-row h-screen overflow-hidden animate-slide-in relative">
         <!-- Left: Wizard -->
         <div class="w-full lg:w-[400px] xl:w-[450px] flex-shrink-0 h-full overflow-hidden border-r border-gray-200 bg-white shadow-2xl z-20 flex flex-col no-print">
           <div class="flex-1 overflow-hidden p-6 relative">
-             <LetterWizard @home="started = false" @download="handleDownload" @download-word="handleDownloadWord" :is-generating="isGenerating" />
+             <LetterWizard @home="currentView = 'hero'" @download="handleDownload" @download-word="handleDownloadWord" :is-generating="isGenerating" />
           </div>
         </div>
 

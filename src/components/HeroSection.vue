@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { Key, Home } from 'lucide-vue-next'
-defineEmits(['start'])
+import { Key, Home, Calculator } from 'lucide-vue-next'
+import SiteFooter from './SiteFooter.vue'
+defineEmits(['start', 'start-tools'])
 </script>
 
 <template>
-  <div class="flex flex-col items-center justify-center min-h-screen text-center px-4 bg-gradient-to-b from-legal-navy/5 to-white">
+  <div class="flex flex-col min-h-screen text-center px-4 bg-gradient-to-b from-legal-navy/5 to-white">
+    <div class="flex-1 flex flex-col items-center justify-center w-full">
     <div class="mb-16 animate-fade-in-down">
       <div class="w-28 h-28 bg-gradient-to-br from-legal-navy to-slate-700 rounded-3xl flex items-center justify-center shadow-2xl mt-4">
         <svg class="w-14 h-14 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -73,6 +75,32 @@ defineEmits(['start'])
         </div>
       </div>
     </div>
+
+    <!-- Utility Tools Section -->
+    <!-- Utility Tools Section -->
+    <div class="mt-8 w-full max-w-5xl animate-fade-in-up delay-200 px-4">
+       <button 
+         @click="$emit('start-tools')"
+         class="w-full bg-white/90 backdrop-blur-sm rounded-3xl p-6 border hover:border-indigo-500/30 shadow-xl transition-all duration-300 hover:shadow-2xl flex items-center justify-between group text-left px-8"
+       >
+         <div class="flex items-center gap-6">
+            <div class="bg-indigo-50 p-4 rounded-2xl group-hover:bg-indigo-100 transition-colors">
+                <Calculator class="w-8 h-8 text-indigo-600" />
+            </div>
+            <div>
+                <h3 class="text-xl font-bold text-slate-800 mb-1">實用小工具</h3>
+                <p class="text-slate-500 text-sm">租屋補助試算、違約金計算機</p>
+            </div>
+         </div>
+         
+         <div class="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center group-hover:bg-indigo-600 group-hover:text-white transition-all">
+             <span class="text-lg">→</span>
+         </div>
+       </button>
+    </div>
+    </div>
+
+    <SiteFooter />
   </div>
 </template>
 
