@@ -6,7 +6,7 @@ defineEmits(['start', 'start-tools'])
 
 <template>
   <div class="flex flex-col min-h-screen text-center px-4 bg-gradient-to-b from-legal-navy/5 to-white">
-    <div class="flex-1 flex flex-col items-center justify-center w-full">
+    <div class="flex-1 flex flex-col items-center justify-center w-full pb-12 md:pb-24">
     <div class="mb-16 animate-fade-in-down">
       <div class="w-28 h-28 bg-gradient-to-br from-legal-navy to-slate-700 rounded-3xl flex items-center justify-center shadow-2xl mt-4">
         <svg class="w-14 h-14 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">

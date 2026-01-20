@@ -81,7 +81,7 @@ const penaltyResult = computed(() => {
 
 <template>
   <div class="min-h-screen flex flex-col animate-fade-in-up">
-    <div class="max-w-4xl mx-auto w-full flex-1 flex flex-col p-4 md:p-6">
+    <div class="max-w-4xl mx-auto w-full flex-1 flex flex-col p-4 md:p-6 pb-12 md:pb-20">
     <!-- Header -->
     <div class="mb-6 flex items-center justify-between">
       <div>
