@@ -1,16 +1,22 @@
 <script setup lang="ts">
 import { useLetterStore } from '../stores/letter'
 import { ref, computed } from 'vue'
-import { User, MapPin, Briefcase, FileText, ChevronRight, ChevronLeft, Home, Banknote, FileX, Coins, Hammer, Lightbulb, DoorOpen, AlertTriangle, Zap } from 'lucide-vue-next'
+import { User, MapPin, Briefcase, FileText, ChevronRight, ChevronLeft, Home, Banknote, FileX, Coins, Hammer, Lightbulb, DoorOpen, AlertTriangle, Zap, Camera, Trash2, Plus } from 'lucide-vue-next'
 
 const store = useLetterStore()
 const currentStep = ref(1)
 defineProps<{ isGenerating?: boolean }>()
-const steps = computed(() => [
-  { id: 1, title: '基本資料', icon: User },
-  { id: 2, title: store.documentType === 'contract' ? '合約細節' : '租約背景', icon: Briefcase },
-  { id: 3, title: '補充說明', icon: FileText },
-])
+const steps = computed(() => {
+  const base = [
+    { id: 1, title: '基本資料', icon: User },
+    { id: 2, title: store.documentType === 'contract' ? '合約細節' : '租約背景', icon: Briefcase },
+    { id: 3, title: '補充說明', icon: FileText },
+  ]
+  if (store.documentType === 'contract') {
+    base.push({ id: 4, title: '房屋現況', icon: Camera })
+  }
+  return base
+})
 
 // Date & Amount Validation
 const dateErrors = ref<{ 
@@ -167,6 +173,91 @@ const confirmDownload = (type: 'pdf' | 'word') => {
 
 const printPDF = () => {
   showConfirmModal.value = true
+}
+
+// --- Inventory Photo Logic ---
+const showCustomLabelInput = ref(false)
+const customLabel = ref('')
+const fileInput = ref<HTMLInputElement | null>(null)
+
+const triggerFileInput = () => {
+  fileInput.value?.click()
+}
+
+const presetLabels = ['客廳現況', '廚房現況', '浴室現況', '臥室現況', '陽台/窗台', '冷氣設備', '熱水器', '鑰匙/磁扣']
+
+const handlePhotoUpload = async (event: Event) => {
+  const input = event.target as HTMLInputElement
+  if (!input.files || input.files.length === 0) return
+  
+  const file = input.files[0]
+  if (!file) return
+
+  const reader = new FileReader()
+  
+  reader.onload = (e) => {
+    const img = new Image()
+    img.onload = () => {
+      // Canvas for resizing and watermarking
+      const canvas = document.createElement('canvas')
+      const ctx = canvas.getContext('2d')
+      if (!ctx) return
+      
+      // Resize logic (Max width 800px)
+      const MAX_WIDTH = 800
+      let width = img.width
+      let height = img.height
+      
+      if (width > MAX_WIDTH) {
+        height *= MAX_WIDTH / width
+        width = MAX_WIDTH
+      }
+      
+      canvas.width = width
+      canvas.height = height
+      
+      // Draw image
+      ctx.drawImage(img, 0, 0, width, height)
+      
+      // Draw Watermark
+      const now = new Date()
+      const dateStr = `拍攝日期：${now.getFullYear()}/${(now.getMonth()+1).toString().padStart(2, '0')}/${now.getDate().toString().padStart(2, '0')}`
+      
+      ctx.font = 'bold 24px sans-serif'
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.8)'
+      ctx.textAlign = 'right'
+      ctx.textBaseline = 'bottom'
+      // Draw shadow for readability
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.5)'
+      ctx.shadowBlur = 4
+      ctx.shadowOffsetX = 1
+      ctx.shadowOffsetY = 1
+      
+      ctx.fillText(dateStr, width - 20, height - 20)
+      
+      // Save Base64
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.8)
+      
+      // Add to store
+      const label = customLabel.value || '房屋現況'
+      store.inventoryItems.push({
+        id: Date.now().toString(),
+        label: label,
+        image: dataUrl
+      })
+      
+      // Reset
+      customLabel.value = ''
+      showCustomLabelInput.value = false
+      if (fileInput.value) fileInput.value.value = ''
+    }
+    img.src = e.target?.result as string
+  }
+  reader.readAsDataURL(file)
+}
+
+const removePhoto = (id: string) => {
+  store.inventoryItems = store.inventoryItems.filter(item => item.id !== id)
 }
 </script>
 
@@ -595,6 +686,50 @@ const printPDF = () => {
           </div>
         </div>
       </div>
+
+      <!-- Step 4: Inventory Check (Contracts) -->
+      <div v-if="currentStep === 4 && store.documentType === 'contract'" class="space-y-6 animate-fade-in-up">
+         <div class="bg-blue-50 p-4 rounded-xl border border-blue-100 flex items-start gap-3">
+           <Camera class="w-5 h-5 text-legal-navy shrink-0 mt-0.5" />
+           <div class="text-sm text-blue-900 leading-relaxed">
+             <strong>保存證據：</strong>退租糾紛常源於對「原狀」認知不同。建議在此上傳交屋時的現況照片（如牆面、地板、設備），系統將自動壓上日期浮水印並附於合約後，保障雙方權益。
+           </div>
+         </div>
+
+         <div class="space-y-4">
+           <h3 class="text-lg font-semibold text-slate-800 flex items-center justify-between">
+             <span>現況照片</span>
+             <span class="text-sm font-normal text-slate-500">{{ store.inventoryItems.length }} 張照片</span>
+           </h3>
+
+           <!-- Photo Grid -->
+           <div class="grid grid-cols-2 gap-4">
+             <div v-for="item in store.inventoryItems" :key="item.id" class="relative group aspect-[4/3] rounded-xl overflow-hidden border border-slate-200 bg-slate-50">
+               <img :src="item.image" class="w-full h-full object-cover" />
+               <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-3">
+                  <span class="text-white text-sm font-medium truncate">{{ item.label }}</span>
+               </div>
+               <button 
+                 @click="removePhoto(item.id)"
+                 class="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-all hover:bg-red-600 shadow-sm"
+               >
+                 <Trash2 class="w-4 h-4" />
+               </button>
+             </div>
+
+             <!-- Add Button -->
+             <button 
+               @click="showCustomLabelInput = true" 
+               class="aspect-[4/3] rounded-xl border-2 border-dashed border-slate-300 hover:border-legal-navy hover:bg-blue-50/50 flex flex-col items-center justify-center text-slate-400 hover:text-legal-navy transition-all group"
+             >
+               <div class="p-3 rounded-full bg-slate-100 group-hover:bg-white mb-2 transition-colors">
+                 <Plus class="w-6 h-6" />
+               </div>
+               <span class="text-sm font-medium">新增照片</span>
+             </button>
+           </div>
+         </div>
+      </div>
     </div>
 
     <!-- Navigation Footer -->
@@ -693,6 +828,50 @@ const printPDF = () => {
       </div>
     </div>
   </div>
+
+  <!-- Photo Upload Modal / Sheet -->
+    <div v-if="showCustomLabelInput" class="fixed inset-0 z-[100] flex items-end sm:items-center justify-center sm:p-4 bg-slate-900/40 backdrop-blur-sm animate-fade-in">
+       <div class="bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden transform transition-all animate-scale-up p-6 space-y-4">
+          <h3 class="text-lg font-bold text-slate-800">新增房屋現況照片</h3>
+          
+          <div class="space-y-2">
+            <label class="text-sm font-medium text-slate-700">選擇標籤 或 自行輸入</label>
+            <div class="flex flex-wrap gap-2 mb-2">
+              <button 
+                v-for="label in presetLabels" 
+                :key="label"
+                @click="customLabel = label"
+                :class="['px-3 py-1.5 text-xs rounded-lg border transition-colors', customLabel === label ? 'border-legal-navy bg-legal-navy text-white' : 'border-slate-200 text-slate-600 hover:bg-slate-50']"
+              >
+                {{ label }}
+              </button>
+            </div>
+            <input 
+              v-model="customLabel" 
+              type="text" 
+              placeholder="輸入自訂名稱..." 
+              class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:border-legal-navy outline-none text-sm"
+            />
+          </div>
+
+          <div class="pt-2 flex gap-3">
+             <button @click="showCustomLabelInput = false" class="flex-1 py-2.5 text-slate-500 font-medium hover:bg-slate-50 rounded-xl transition-colors">取消</button>
+             <button 
+               @click="triggerFileInput" 
+               class="flex-1 py-2.5 bg-legal-navy text-white font-medium rounded-xl hover:bg-blue-900 transition-colors shadow-lg shadow-blue-900/20"
+             >
+               選擇照片
+             </button>
+          </div>
+          <input 
+            ref="fileInput"
+            type="file" 
+            accept="image/*" 
+            class="hidden" 
+            @change="handlePhotoUpload"
+          />
+       </div>
+    </div>
 </template>
 
 <style scoped>

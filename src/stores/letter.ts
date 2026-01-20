@@ -29,6 +29,9 @@ export const useLetterStore = defineStore('letter', () => {
   const intrusionDate = ref('') // 妨害安寧日期
 
   const facts = ref<string>('')
+  
+  // Inventory Items (Photo + Label)
+  const inventoryItems = ref<{ id: string, label: string, image: string }[]>([])
 
   const generatedContent = computed(() => {
     // Helper: Convert date string to ROC format (中華民國 xxx 年 x 月 x 日)
@@ -263,6 +266,7 @@ ${dateStr}
     propertyAddress, leaseStart, leaseEnd, rentAmount, depositAmount,
     arrearsStart, arrearsCount, arrearsTotal, 
     repairItem, repairNotifyDate, moveOutDate, evictionDeadline, breachDetails, intrusionDate,
-    facts, generatedContent 
+    facts, generatedContent,
+    inventoryItems 
   }
 })

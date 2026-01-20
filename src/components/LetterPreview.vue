@@ -37,6 +37,25 @@ defineProps<{ hideShadow?: boolean }>()
       <div class="mt-12 pt-4 border-t border-slate-100/50 text-center text-[10px] text-slate-400 font-sans select-none">
         免責聲明 (Disclaimer)：本工具生成之文件僅供參考，不代表律師正式法律意見
       </div>
+
+      <!-- Appendix: Inventory Check -->
+      <div v-if="store.documentType === 'contract' && store.inventoryItems.length > 0" class="break-before-page mt-8">
+         <div class="text-center mb-8 pt-8 border-t-2 border-slate-800">
+           <h2 class="text-2xl font-bold mb-2">【附件】房屋現況確認書</h2>
+           <p class="text-sm text-slate-500">此附件為租賃契約之一部分，記載交屋時之現況。</p>
+         </div>
+         
+         <div class="grid grid-cols-2 gap-8">
+           <div v-for="item in store.inventoryItems" :key="item.id" class="space-y-2 break-inside-avoid">
+             <div class="aspect-[4/3] border border-slate-300 bg-slate-50 relative">
+               <img :src="item.image" class="w-full h-full object-contain" />
+             </div>
+             <div class="text-center font-medium text-slate-700 bg-slate-100 py-1 rounded">
+               {{ item.label }}
+             </div>
+           </div>
+         </div>
+      </div>
     </div>
   </div>
 </template>
@@ -48,5 +67,9 @@ defineProps<{ hideShadow?: boolean }>()
     0 2px 4px -1px rgba(0, 0, 0, 0.06),
     0 20px 25px -5px rgba(0, 0, 0, 0.1), 
     0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.break-before-page {
+  page-break-before: always;
 }
 </style>
