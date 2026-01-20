@@ -8,7 +8,6 @@ export const useLetterStore = defineStore('letter', () => {
   const documentType = ref<'letter' | 'contract'>('letter')
   const category = ref<string>('欠繳租金')
   
-  // Lease details
   const propertyAddress = ref('')
   const leaseStart = ref('')
   const leaseEnd = ref('')
