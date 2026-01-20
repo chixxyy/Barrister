@@ -26,9 +26,7 @@ defineProps<{ hideShadow?: boolean }>()
       <div v-if="store.documentType === 'letter'" class="absolute inset-[20px] border-2 border-green-800/20 pointer-events-none z-0"></div>
 
       <!-- Watermark text (background) -->
-      <div v-if="store.documentType === 'letter'" class="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none z-0">
-         <span class="text-9xl font-serif font-bold rotate-[-45deg] select-none">LEGAL EASE</span>
-      </div>
+
 
       <!-- Content -->
     <div class="relative z-10 px-[2.5cm] py-[2.5cm] min-h-[297mm] flex flex-col font-serif text-slate-900 leading-relaxed text-[12pt]">
