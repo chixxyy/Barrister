@@ -91,9 +91,8 @@ export const useLetterStore = defineStore('letter', () => {
         courtArticleNum = '五'
       }
 
-      return `住宅租賃契約書
-
-立契約書人：
+      // Title is handled separately in LetterPreview, so we remove it from here
+      return `立契約書人：
 出租人：${partyA.name || '（姓名）'}（以下簡稱甲方）
 承租人：${partyB.name || '（姓名）'}（以下簡稱乙方）
 
@@ -242,9 +241,7 @@ ${basicArticles}${otherArticle}
     }
 
     // Template structure
-    return `存證信函
-
-寄件人：${sender.value.name || '（姓名）'}
+    return `寄件人：${sender.value.name || '（姓名）'}
 地  址：${sender.value.address || '（完整地址）'}
 
 收件人：${receiver.value.name || '（姓名）'}

@@ -32,6 +32,9 @@ defineProps<{ hideShadow?: boolean }>()
 
       <!-- Content -->
     <div class="relative z-10 px-[2.5cm] py-[2.5cm] min-h-[297mm] flex flex-col font-serif text-slate-900 leading-relaxed text-[12pt]">
+      <h1 class="text-3xl font-bold text-center mb-10 pb-4 border-b-2 border-slate-800 tracking-widest break-after-avoid">
+        {{ store.documentType === 'contract' ? '住宅租賃契約書' : '存 證 信 函' }}
+      </h1>
       <div class="flex-1 whitespace-pre-wrap">{{ store.generatedContent }}</div>
       
       <div class="mt-12 pt-4 border-t border-slate-100/50 text-center text-[10px] text-slate-400 font-sans select-none">
@@ -39,21 +42,26 @@ defineProps<{ hideShadow?: boolean }>()
       </div>
 
       <!-- Appendix: Inventory Check -->
-      <div v-if="store.documentType === 'contract' && store.inventoryItems.length > 0" class="break-before-page mt-8">
-         <div class="text-center mb-8 pt-8 border-t-2 border-slate-800">
-           <h2 class="text-2xl font-bold mb-2">【附件】房屋現況確認書</h2>
-           <p class="text-sm text-slate-500">此附件為租賃契約之一部分，記載交屋時之現況。</p>
+      <div v-if="store.documentType === 'contract' && store.inventoryItems.length > 0" class="break-before-page mt-4 flex flex-col min-h-[297mm] pb-[2.5cm]">
+         <div class="text-center mb-6 pt-6 border-t border-slate-800/20 font-sans shrink-0">
+           <h2 class="text-xl font-bold mb-1 text-slate-900">【附件】房屋現況確認書</h2>
+           <p class="text-xs text-slate-500">此附件為租賃契約之一部分，記載交屋時之現況。</p>
          </div>
          
-         <div class="grid grid-cols-2 gap-8">
-           <div v-for="item in store.inventoryItems" :key="item.id" class="space-y-2 break-inside-avoid">
-             <div class="aspect-[4/3] border border-slate-300 bg-slate-50 relative">
+         <div class="grid grid-cols-2 gap-x-4 gap-y-6 flex-1 content-start">
+           <div v-for="item in store.inventoryItems" :key="item.id" class="break-inside-avoid flex flex-col items-center space-y-2">
+             <div class="w-full aspect-[4/3] border border-slate-200 bg-white p-1 relative shadow-sm">
                <img :src="item.image" class="w-full h-full object-contain" />
              </div>
-             <div class="text-center font-medium text-slate-700 bg-slate-100 py-1 rounded">
+             <div class="text-center font-bold text-slate-700 text-sm border-b-2 border-slate-100 pb-1 px-4">
                {{ item.label }}
              </div>
            </div>
+         </div>
+
+         <!-- Repeated Disclaimer for Appendix -->
+         <div class="mt-auto pt-4 border-t border-slate-100/50 text-center text-[10px] text-slate-400 font-sans select-none shrink-0 break-before-avoid">
+           免責聲明 (Disclaimer)：本工具生成之文件僅供參考，不代表律師正式法律意見
          </div>
       </div>
     </div>
