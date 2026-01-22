@@ -273,20 +273,20 @@ const removePhoto = (id: string) => {
       </button>
 
       <div class="flex items-center justify-between mb-2">
-         <h2 class="text-2xl font-bold text-legal-navy">
+         <h2 class="text-2xl font-bold text-primary-700">
            {{ store.documentType === 'contract' ? '建立租賃契約' : '產生存證信函' }}
          </h2>
       </div>
 
       <div class="flex items-center space-x-2 text-sm text-slate-500">
-        <span class="font-medium text-legal-navy">步驟 {{ currentStep }}</span>
+        <span class="font-medium text-primary-700">步驟 {{ currentStep }}</span>
         <span>/</span>
         <span>{{ steps.length }}</span>
       </div>
       <!-- Progress Bar -->
       <div class="w-full bg-slate-100 h-2 mt-4 rounded-full overflow-hidden">
         <div 
-          class="bg-legal-navy h-full transition-all duration-500 ease-out"
+          class="bg-primary-900 h-full transition-all duration-500 ease-out"
           :style="{ width: `${(currentStep / steps.length) * 100}%` }"
         ></div>
       </div>
@@ -300,7 +300,7 @@ const removePhoto = (id: string) => {
         <!-- Category Selection (Only for Letter) -->
         <div v-if="store.documentType === 'letter'" class="space-y-3">
           <h3 class="text-lg font-semibold text-slate-800 flex items-center">
-            <Briefcase class="w-5 h-5 mr-2 text-legal-navy" /> 案件類型
+            <Briefcase class="w-5 h-5 mr-2 text-primary-700" /> 案件類型
           </h3>
           <div class="grid grid-cols-2 gap-4">
             <template v-if="store.userRole === 'landlord'">
@@ -316,7 +316,7 @@ const removePhoto = (id: string) => {
                  :class="[
                    'relative flex flex-col items-center justify-center p-5 rounded-xl border-2 transition-all duration-200 group overflow-hidden text-center h-full w-full aspect-square',
                    store.category === cat.label
-                     ? 'border-legal-navy bg-blue-50/50 text-legal-navy shadow-md scale-[1.02] z-10'
+                     ? 'border-legal-navy bg-primary-50/50 text-primary-700 shadow-md scale-[1.02] z-10'
                      : 'border-slate-100 bg-white text-slate-500 hover:border-slate-200 hover:bg-slate-50'
                  ]"
               >
@@ -325,7 +325,7 @@ const removePhoto = (id: string) => {
                  </div>
                  <span class="font-bold text-sm block mb-1">{{ cat.label }}</span>
                  <span class="text-[11px] leading-tight opacity-70 block">{{ cat.desc }}</span>
-                 <div v-if="store.category === cat.label" class="absolute top-3 right-3 w-2.5 h-2.5 rounded-full bg-legal-navy"></div>
+                 <div v-if="store.category === cat.label" class="absolute top-3 right-3 w-2.5 h-2.5 rounded-full bg-primary-900"></div>
               </button>
             </template>
             <template v-else>
@@ -341,7 +341,7 @@ const removePhoto = (id: string) => {
                  :class="[
                    'relative flex flex-col items-center justify-center p-5 rounded-xl border-2 transition-all duration-200 group overflow-hidden text-center h-full w-full aspect-square',
                    store.category === cat.label
-                     ? 'border-legal-navy bg-blue-50/50 text-legal-navy shadow-md scale-[1.02] z-10'
+                     ? 'border-legal-navy bg-primary-50/50 text-primary-700 shadow-md scale-[1.02] z-10'
                      : 'border-slate-100 bg-white text-slate-500 hover:border-slate-200 hover:bg-slate-50'
                  ]"
               >
@@ -350,7 +350,7 @@ const removePhoto = (id: string) => {
                  </div>
                  <span class="font-bold text-sm block mb-1">{{ cat.label }}</span>
                  <span class="text-[11px] leading-tight opacity-70 block">{{ cat.desc }}</span>
-                 <div v-if="store.category === cat.label" class="absolute top-3 right-3 w-2.5 h-2.5 rounded-full bg-legal-navy"></div>
+                 <div v-if="store.category === cat.label" class="absolute top-3 right-3 w-2.5 h-2.5 rounded-full bg-primary-900"></div>
               </button>
             </template>
           </div>
@@ -361,7 +361,7 @@ const removePhoto = (id: string) => {
 
         <div class="space-y-4">
           <h3 class="text-lg font-semibold text-slate-800 flex items-center">
-            <User class="w-5 h-5 mr-2 text-legal-navy" /> 
+            <User class="w-5 h-5 mr-2 text-primary-700" /> 
             <span v-if="store.documentType === 'contract'">
               {{ store.userRole === 'landlord' ? '出租人（甲方 - 您）' : '承租人（乙方 - 您）' }}
             </span>
@@ -370,15 +370,15 @@ const removePhoto = (id: string) => {
             </span>
           </h3>
           <div class="grid grid-cols-1 gap-3">
-             <input v-model="store.sender.name" type="text" :placeholder="store.documentType === 'contract' ? (store.userRole === 'landlord' ? '甲方姓名' : '乙方姓名') : '姓名 / 公司名稱'" class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:border-legal-navy focus:ring-2 focus:ring-legal-navy/20 transition-all outline-none" />
-             <input v-model="store.sender.idNumber" type="text" :placeholder="store.documentType === 'contract' ? (store.userRole === 'landlord' ? '甲方身分證字號' : '乙方身分證字號') : '身分證字號 (選填)'" class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:border-legal-navy focus:ring-2 focus:ring-legal-navy/20 transition-all outline-none" />
-             <input v-model="store.sender.address" type="text" :placeholder="store.documentType === 'contract' ? (store.userRole === 'landlord' ? '甲方戶籍地址' : '乙方戶籍地址') : '聯絡地址'" class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:border-legal-navy focus:ring-2 focus:ring-legal-navy/20 transition-all outline-none" />
+             <input v-model="store.sender.name" type="text" :placeholder="store.documentType === 'contract' ? (store.userRole === 'landlord' ? '甲方姓名' : '乙方姓名') : '姓名 / 公司名稱'" class="input-field" />
+             <input v-model="store.sender.idNumber" type="text" :placeholder="store.documentType === 'contract' ? (store.userRole === 'landlord' ? '甲方身分證字號' : '乙方身分證字號') : '身分證字號 (選填)'" class="input-field" />
+             <input v-model="store.sender.address" type="text" :placeholder="store.documentType === 'contract' ? (store.userRole === 'landlord' ? '甲方戶籍地址' : '乙方戶籍地址') : '聯絡地址'" class="input-field" />
           </div>
         </div>
 
         <div class="space-y-4">
           <h3 class="text-lg font-semibold text-slate-800 flex items-center">
-            <MapPin class="w-5 h-5 mr-2 text-legal-navy" /> 
+            <MapPin class="w-5 h-5 mr-2 text-primary-700" /> 
             <span v-if="store.documentType === 'contract'">
               {{ store.userRole === 'landlord' ? '承租人（乙方）' : '出租人（甲方）' }}
             </span>
@@ -387,9 +387,9 @@ const removePhoto = (id: string) => {
             </span>
           </h3>
           <div class="grid grid-cols-1 gap-3">
-             <input v-model="store.receiver.name" type="text" :placeholder="store.documentType === 'contract' ? (store.userRole === 'landlord' ? '乙方姓名' : '甲方姓名') : '對方姓名'" class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:border-legal-navy focus:ring-2 focus:ring-legal-navy/20 transition-all outline-none" />
-             <input v-model="store.receiver.idNumber" type="text" :placeholder="store.documentType === 'contract' ? (store.userRole === 'landlord' ? '乙方身分證字號' : '甲方身分證字號') : '對方身分證字號 (選填)'" class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:border-legal-navy focus:ring-2 focus:ring-legal-navy/20 transition-all outline-none" />
-             <input v-model="store.receiver.address" type="text" :placeholder="store.documentType === 'contract' ? (store.userRole === 'landlord' ? '乙方戶籍地址' : '甲方戶籍地址') : '對方地址'" class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:border-legal-navy focus:ring-2 focus:ring-legal-navy/20 transition-all outline-none" />
+             <input v-model="store.receiver.name" type="text" :placeholder="store.documentType === 'contract' ? (store.userRole === 'landlord' ? '乙方姓名' : '甲方姓名') : '對方姓名'" class="input-field" />
+             <input v-model="store.receiver.idNumber" type="text" :placeholder="store.documentType === 'contract' ? (store.userRole === 'landlord' ? '乙方身分證字號' : '甲方身分證字號') : '對方身分證字號 (選填)'" class="input-field" />
+             <input v-model="store.receiver.address" type="text" :placeholder="store.documentType === 'contract' ? (store.userRole === 'landlord' ? '乙方戶籍地址' : '甲方戶籍地址') : '對方地址'" class="input-field" />
           </div>
         </div>
       </div>
@@ -404,7 +404,7 @@ const removePhoto = (id: string) => {
         <div class="space-y-4">
            <div>
              <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">租賃標的（房屋地址）</label>
-             <input v-model="store.propertyAddress" type="text" placeholder="若同收件地址可留空" class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:border-legal-navy focus:ring-2 focus:ring-legal-navy/20 transition-all outline-none" />
+             <input v-model="store.propertyAddress" type="text" placeholder="若同收件地址可留空" class="input-field" />
            </div>
 
            <div class="grid grid-cols-2 gap-4">
@@ -485,9 +485,9 @@ const removePhoto = (id: string) => {
       <div v-if="currentStep === 3" class="space-y-6 animate-fade-in-up">
         
         <!-- Legal Insight Banner -->
-        <div class="bg-blue-50 p-4 rounded-xl border border-blue-100 flex items-start gap-3">
-          <Lightbulb class="w-5 h-5 text-legal-navy shrink-0 mt-0.5" />
-          <div class="text-sm text-blue-900 leading-relaxed">
+        <div class="bg-primary-50 p-4 rounded-xl border border-primary-100 flex items-start gap-3">
+          <Lightbulb class="w-5 h-5 text-primary-700 shrink-0 mt-0.5" />
+          <div class="text-sm text-primary-900 leading-relaxed">
              <template v-if="store.documentType === 'letter'">
                <p v-if="store.category === '欠繳租金'"><strong>民法第440條：</strong>承租人租金支付有遲延者，出租人得定相當期限，催告承租人支付租金，如承租人於其期限內不為支付，出租人得終止契約。</p>
                <p v-if="store.category === '租約終止'"><strong>民法第450條/455條：</strong>租賃定有期限者，其租賃關係，於期限屆滿時消滅...租賃關係消滅後，承租人應返還租賃物。</p>
@@ -664,7 +664,7 @@ const removePhoto = (id: string) => {
           <textarea 
             v-model="store.facts" 
             rows="8" 
-            class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:border-legal-navy focus:ring-2 focus:ring-legal-navy/20 transition-all outline-none resize-none"
+            class="input-field resize-none"
             :placeholder="store.documentType === 'contract' ? '例如：乙方不得將房屋轉租於他人...' : '請填寫其他補充事項（上方欄位已填寫者無需重複）...'"
           ></textarea>
           
@@ -689,9 +689,9 @@ const removePhoto = (id: string) => {
 
       <!-- Step 4: Inventory Check (Contracts) -->
       <div v-if="currentStep === 4 && store.documentType === 'contract'" class="space-y-6 animate-fade-in-up">
-         <div class="bg-blue-50 p-4 rounded-xl border border-blue-100 flex items-start gap-3">
-           <Camera class="w-5 h-5 text-legal-navy shrink-0 mt-0.5" />
-           <div class="text-sm text-blue-900 leading-relaxed">
+         <div class="bg-primary-50 p-4 rounded-xl border border-primary-100 flex items-start gap-3">
+           <Camera class="w-5 h-5 text-primary-700 shrink-0 mt-0.5" />
+           <div class="text-sm text-primary-900 leading-relaxed">
              <strong>保存證據：</strong>退租糾紛常源於對「原狀」認知不同。建議在此上傳交屋時的現況照片（如牆面、地板、設備），系統將自動壓上日期浮水印並附於合約後，保障雙方權益。
            </div>
          </div>
@@ -720,7 +720,7 @@ const removePhoto = (id: string) => {
              <!-- Add Button -->
              <button 
                @click="showCustomLabelInput = true" 
-               class="aspect-[4/3] rounded-xl border-2 border-dashed border-slate-300 hover:border-legal-navy hover:bg-blue-50/50 flex flex-col items-center justify-center text-slate-400 hover:text-legal-navy transition-all group"
+               class="aspect-[4/3] rounded-xl border-2 border-dashed border-slate-300 hover:border-legal-navy hover:bg-primary-50/50 flex flex-col items-center justify-center text-slate-400 hover:text-primary-700 transition-all group"
              >
                <div class="p-3 rounded-full bg-slate-100 group-hover:bg-white mb-2 transition-colors">
                  <Plus class="w-6 h-6" />
@@ -753,7 +753,7 @@ const removePhoto = (id: string) => {
           'px-8 py-3 rounded-xl shadow-lg transition-all flex items-center transform',
           (currentStep === 2 && step2HasErrors)
             ? 'bg-slate-300 text-slate-500 cursor-not-allowed shadow-none'
-            : 'bg-legal-navy text-white shadow-legal-navy/30 hover:bg-blue-900 hover:-translate-y-0.5'
+            : 'btn-primary shadow-xl'
         ]"
       >
         下一步 <ChevronRight class="w-4 h-4 ml-1" />
@@ -808,7 +808,7 @@ const removePhoto = (id: string) => {
           :disabled="isGenerating"
           class="py-4 px-6 text-left hover:bg-slate-50 transition-colors bg-white active:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed flex items-center group w-full border-t border-slate-100"
         >
-          <div class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center mr-4 group-hover:bg-blue-100 transition-colors shrink-0">
+          <div class="w-10 h-10 rounded-full bg-primary-50 flex items-center justify-center mr-4 group-hover:bg-blue-100 transition-colors shrink-0">
              <FileText class="w-5 h-5 text-blue-600" />
           </div>
           <div class="flex-1">
@@ -841,7 +841,7 @@ const removePhoto = (id: string) => {
                 v-for="label in presetLabels" 
                 :key="label"
                 @click="customLabel = label"
-                :class="['px-3 py-1.5 text-xs rounded-lg border transition-colors', customLabel === label ? 'border-legal-navy bg-legal-navy text-white' : 'border-slate-200 text-slate-600 hover:bg-slate-50']"
+                :class="['px-3 py-1.5 text-xs rounded-lg border transition-colors', customLabel === label ? 'border-legal-navy bg-primary-900 text-white' : 'border-slate-200 text-slate-600 hover:bg-slate-50']"
               >
                 {{ label }}
               </button>
@@ -858,7 +858,7 @@ const removePhoto = (id: string) => {
              <button @click="showCustomLabelInput = false" class="flex-1 py-2.5 text-slate-500 font-medium hover:bg-slate-50 rounded-xl transition-colors">取消</button>
              <button 
                @click="triggerFileInput" 
-               class="flex-1 py-2.5 bg-legal-navy text-white font-medium rounded-xl hover:bg-blue-900 transition-colors shadow-lg shadow-blue-900/20"
+               class="flex-1 py-2.5 bg-primary-900 text-white font-medium rounded-xl hover:bg-blue-900 transition-colors shadow-lg shadow-blue-900/20"
              >
                選擇照片
              </button>

@@ -83,30 +83,33 @@ const penaltyResult = computed(() => {
   <div class="min-h-screen flex flex-col animate-fade-in-up">
     <div class="max-w-4xl mx-auto w-full flex-1 flex flex-col p-4 md:p-6 pb-12 md:pb-20">
     <!-- Header -->
-    <div class="mb-6 flex items-center justify-between">
+    <div class="mb-8 flex items-center justify-between">
       <div>
-        <h2 class="text-xl md:text-2xl font-bold text-slate-800 flex items-center gap-2">
-          <Banknote class="w-6 h-6 text-legal-navy" /> 實用租屋試算
+        <h2 class="text-2xl md:text-3xl font-black text-slate-900 flex items-center gap-3">
+          <div class="p-2 bg-primary-100/50 rounded-xl">
+            <Banknote class="w-7 h-7 text-primary-600" />
+          </div>
+          實用租屋試算
         </h2>
-        <p class="text-slate-500 text-sm mt-1">快速計算補助金額與解約違約金</p>
+        <p class="text-slate-500 mt-2 font-light">快速計算補助金額與解約違約金</p>
       </div>
       <button 
         @click="$emit('home')"
-        class="flex items-center text-slate-500 hover:text-legal-navy transition-colors px-4 py-2 rounded-lg hover:bg-slate-100"
+        class="flex items-center text-slate-500 hover:text-primary-700 hover:bg-white transition-all px-4 py-2.5 rounded-xl border border-transparent hover:border-slate-200 hover:shadow-sm"
       >
-        <ArrowLeft class="w-4 h-4 mr-1" /> 回首頁
+        <ArrowLeft class="w-4 h-4 mr-2" /> 回首頁
       </button>
     </div>
 
     <!-- Tabs -->
-    <div class="flex p-1 bg-slate-100 rounded-xl mb-6 w-full max-w-md mx-auto">
+    <div class="flex p-1.5 bg-slate-200/50 backdrop-blur-md rounded-2xl mb-8 w-full max-w-md mx-auto relative overflow-hidden">
       <button 
         v-for="tab in [{ id: 'subsidy', label: '租金補貼試算' }, { id: 'penalty', label: '提前解約計算機' }]"
         :key="tab.id"
         @click="activeTab = tab.id as any"
         :class="[
-          'flex-1 py-2.5 text-sm font-medium rounded-lg transition-all',
-          activeTab === tab.id ? 'bg-white text-legal-navy shadow-sm' : 'text-slate-500 hover:text-slate-700'
+          'flex-1 py-3 text-sm font-bold rounded-xl transition-all relative z-10',
+          activeTab === tab.id ? 'bg-white text-primary-700 shadow-md' : 'text-slate-500 hover:text-slate-700'
         ]"
       >
         {{ tab.label }}
@@ -114,82 +117,89 @@ const penaltyResult = computed(() => {
     </div>
 
     <!-- Content Card -->
-    <div class="bg-white rounded-3xl shadow-xl border border-slate-100 p-6 md:p-8 flex-1 overflow-y-auto">
+    <div class="glass-panel rounded-[2.5rem] p-6 md:p-10 flex-1 overflow-visible relative">
       
       <!-- Subsidy Calculator -->
-      <div v-if="activeTab === 'subsidy'" class="max-w-xl mx-auto space-y-8">
-        <div class="space-y-6">
-           <div class="space-y-2">
-             <label class="block text-sm font-medium text-slate-700">租屋地區</label>
-             <select v-model="subsidyCity" class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 focus:ring-2 focus:ring-legal-navy/20 outline-none">
-               <option v-for="city in subsidyCities" :key="city.value" :value="city.value">{{ city.label }}</option>
-             </select>
+      <transition name="fade" mode="out-in">
+      <div v-if="activeTab === 'subsidy'" key="subsidy" class="max-w-xl mx-auto space-y-10">
+        <div class="space-y-8">
+           <div class="space-y-3">
+             <label class="block text-sm font-bold text-slate-700 ml-1">租屋地區</label>
+             <div class="relative">
+               <select v-model="subsidyCity" class="input-field appearance-none cursor-pointer">
+                 <option v-for="city in subsidyCities" :key="city.value" :value="city.value">{{ city.label }}</option>
+               </select>
+               <div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">▼</div>
+             </div>
            </div>
 
-           <div class="space-y-2">
-             <label class="block text-sm font-medium text-slate-700">身份條件</label>
-             <div class="grid gap-3">
+           <div class="space-y-3">
+             <label class="block text-sm font-bold text-slate-700 ml-1">身份條件</label>
+             <div class="grid gap-4">
                <button 
                   v-for="tier in subsidyIdentities"
                   :key="tier.value"
                   @click="subsidyIdentity = tier.value"
                   :class="[
-                    'text-left p-4 rounded-xl border-2 transition-all hover:bg-slate-50 relative',
-                    subsidyIdentity === tier.value ? 'border-legal-navy bg-blue-50/30' : 'border-slate-100'
+                    'text-left p-5 rounded-2xl border-2 transition-all hover:shadow-md relative group',
+                    subsidyIdentity === tier.value ? 'border-primary-500 bg-primary-50/50' : 'border-slate-100 bg-white hover:border-primary-200'
                   ]"
                >
-                 <div class="font-bold text-slate-800 mb-1 flex items-center justify-between">
+                 <div class="font-bold text-slate-900 mb-1 flex items-center justify-between">
                     {{ tier.label }}
-                    <div v-if="subsidyIdentity === tier.value" class="w-3 h-3 rounded-full bg-legal-navy"></div>
+                    <div v-if="subsidyIdentity === tier.value" class="w-4 h-4 rounded-full bg-primary-500 shadow-glow"></div>
+                    <div v-else class="w-4 h-4 rounded-full border-2 border-slate-200 group-hover:border-primary-300"></div>
                  </div>
-                 <div class="text-xs text-slate-500 leading-relaxed">{{ tier.desc }}</div>
+                 <div class="text-xs text-slate-500 leading-relaxed pl-0.5">{{ tier.desc }}</div>
                </button>
              </div>
            </div>
         </div>
 
         <div class="pt-8 border-t border-slate-100 text-center">
-           <div class="text-slate-500 text-sm mb-2">預估每月補貼金額</div>
-           <div class="text-3xl md:text-4xl font-black text-legal-navy flex items-center justify-center gap-1">
-             <span class="text-xl md:text-2xl">$</span>
+           <div class="text-slate-500 text-sm mb-2 font-medium">預估每月補貼金額</div>
+           <div class="text-5xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-primary-600 to-accent-DEFAULT flex items-center justify-center gap-2 py-2">
+             <span class="text-2xl md:text-3xl font-bold text-slate-400">$</span>
              {{ subsidyResult.toLocaleString() }}
-             <span class="text-base font-medium text-slate-400 self-end mb-1">元 / 月</span>
+             <span class="text-base font-bold text-slate-400 self-end mb-3">元 / 月</span>
            </div>
-           <div class="mt-4 p-3 bg-blue-50 rounded-lg text-xs text-blue-800 leading-relaxed text-left">
-             <AlertTriangle class="w-4 h-4 inline mr-1 mb-0.5" />
+           <div class="mt-6 p-4 bg-primary-50/80 rounded-2xl text-xs text-primary-800 leading-relaxed text-left border border-primary-100/50">
+             <AlertTriangle class="w-4 h-4 inline mr-1 mb-0.5 text-primary-600" />
              <strong>註：</strong>此試算僅供參考 (以300億專案試算，單身青年已加碼1.2倍)。<br>實際金額依內政部營建署審核及各縣市分區標準為準。
            </div>
         </div>
       </div>
 
       <!-- Penalty Calculator -->
-      <div v-if="activeTab === 'penalty'" class="max-w-xl mx-auto space-y-8">
-         <div class="p-4 bg-orange-50 rounded-xl border border-orange-100 flex gap-3 text-orange-900 text-sm">
-             <AlertTriangle class="w-5 h-5 shrink-0" />
+      <div v-else key="penalty" class="max-w-xl mx-auto space-y-10">
+         <div class="p-5 bg-orange-50/80 rounded-2xl border border-orange-100 flex gap-4 text-orange-900 text-sm leading-relaxed backdrop-blur-sm">
+             <div class="bg-white p-2 rounded-full h-fit shadow-sm text-orange-500">
+               <AlertTriangle class="w-5 h-5" />
+             </div>
              <div>
-               <strong>法律小知識：</strong>
-               <p class="mt-1 opacity-90">依《住宅租賃契約應約定及不得約定事項》，若租約有約定可提前終止，違約金最高不得超過「一個月租金」。若未約定，則原則上應履行租期，或雙方協議。</p>
+               <strong class="block mb-1 text-orange-700">法律小知識</strong>
+               <p class="opacity-90">依《住宅租賃契約應約定及不得約定事項》，若租約有約定可提前終止，違約金最高不得超過「一個月租金」。若未約定，則原則上應履行租期，或雙方協議。</p>
              </div>
          </div>
 
-         <div class="space-y-6">
-            <div class="space-y-2">
-               <label class="block text-sm font-medium text-slate-700">每月租金</label>
-               <input v-model.number="rentAmount" type="number" placeholder="請輸入金額" class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 focus:ring-2 focus:ring-legal-navy/20 outline-none" />
+         <div class="space-y-8">
+            <div class="space-y-3">
+               <label class="block text-sm font-bold text-slate-700 ml-1">每月租金</label>
+               <input v-model.number="rentAmount" type="number" placeholder="請輸入金額" class="input-field text-lg font-medium placeholder:text-slate-300" />
             </div>
 
-            <div class="space-y-2">
-               <label class="block text-sm font-medium text-slate-700">是否提前通知房東？</label>
+            <div class="space-y-3">
+               <label class="block text-sm font-bold text-slate-700 ml-1">是否提前通知房東？</label>
                <div class="flex gap-4">
-                 <label class="flex-1 cursor-pointer">
+                 <label class="flex-1 cursor-pointer group">
                    <input type="radio" v-model="hasAdvanceNotice" value="yes" class="peer sr-only">
-                   <div class="p-3 text-center rounded-xl border-2 peer-checked:border-legal-navy peer-checked:bg-blue-50 peer-checked:text-legal-navy text-slate-500 border-slate-100 hover:bg-slate-50 transition-all font-medium">
+                   <div class="p-4 text-center rounded-2xl border-2 peer-checked:border-primary-500 peer-checked:bg-primary-50/50 peer-checked:text-primary-800 text-slate-500 border-slate-100 hover:bg-slate-50 hover:border-slate-200 transition-all font-bold group-hover:shadow-sm">
                      有，依照合約期限
                    </div>
                  </label>
-                 <label class="flex-1 cursor-pointer">
+                 <label class="flex-1 cursor-pointer group">
                    <input type="radio" v-model="hasAdvanceNotice" value="no" class="peer sr-only">
-                   <div class="p-3 text-center rounded-xl border-2 peer-checked:border-legal-navy peer-checked:bg-blue-50 peer-checked:text-legal-navy text-slate-500 border-slate-100 hover:bg-slate-50 transition-all font-medium">
+                   <div class="p-4 text-center rounded-2xl border-2 peer-checked:border-primary-500 peer-checked:bg-primary-50/50 peer-checked:text-primary-800 text-slate-500 border-slate-100 hover:bg-slate-50 hover:border-slate-200 transition-all font-bold group-hover:shadow-sm">
                      無 / 臨時告知
                    </div>
                  </label>
@@ -199,23 +209,27 @@ const penaltyResult = computed(() => {
 
          <div class="pt-8 border-t border-slate-100 text-center">
             <template v-if="rentAmount > 0">
-              <div class="text-slate-500 text-sm mb-2">最高違約金上限</div>
-              <div class="text-4xl font-black text-slate-800 flex items-center justify-center gap-1">
-                <span class="text-2xl">$</span>
+              <div class="text-slate-500 text-sm mb-2 font-medium">最高違約金上限</div>
+              <div class="text-5xl font-black text-slate-800 flex items-center justify-center gap-1 py-2">
+                <span class="text-2xl text-slate-300 font-bold">$</span>
                 {{ penaltyResult.toLocaleString() }}
               </div>
-              <p v-if="hasAdvanceNotice === 'yes'" class="text-green-600 font-medium text-sm mt-2">
+              <p v-if="hasAdvanceNotice === 'yes'" class="text-emerald-600 font-bold text-sm mt-4 bg-emerald-50 inline-block px-4 py-2 rounded-full">
                  🎉 依規定提前通知，通常無需支付違約金。
               </p>
-              <p v-else class="text-orange-600 font-medium text-sm mt-2">
-                 ⚠️ 未依期限通知，最高可收取一個月租金作為賠償，並應補足不足通知期之租金。
+              <p v-else class="text-orange-600 font-bold text-sm mt-4 bg-orange-50 inline-block px-4 py-2 rounded-full">
+                 ⚠️ 最高可收取一個月租金作為賠償 (另需補足通知期租金)
               </p>
             </template>
             <template v-else>
-               <div class="text-slate-300 font-bold text-2xl py-4">請輸入租金開始試算</div>
+               <div class="text-slate-300 font-bold text-2xl py-8 flex flex-col items-center gap-2">
+                 <Banknote class="w-8 h-8 opacity-50" />
+                 請輸入租金開始試算
+               </div>
             </template>
          </div>
       </div>
+      </transition>
 
     </div>
   </div>

@@ -3,8 +3,33 @@
 @tailwind utilities;
 
 
-body {
-  @apply bg-gray-50 text-slate-800 antialiased;
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-slate-50 text-slate-800 antialiased;
+    font-feature-settings: "cv11", "ss01";
+  }
+}
+
+@layer components {
+  .glass-panel {
+    @apply bg-white/80 backdrop-blur-xl border border-white/40 shadow-glass;
+  }
+  .glass-card {
+    @apply bg-white/70 backdrop-blur-lg border border-white/50 shadow-sm transition-all duration-300 hover:shadow-glass-hover hover:bg-white/90 hover:-translate-y-1;
+  }
+  .btn-primary {
+    @apply bg-primary-900 text-white px-6 py-3.5 rounded-2xl font-medium shadow-lg hover:shadow-glow hover:-translate-y-0.5 transition-all duration-300 active:scale-95 flex items-center justify-center gap-2;
+  }
+  .btn-secondary {
+    @apply bg-white text-primary-900 border border-slate-200 px-6 py-3.5 rounded-2xl font-medium shadow-sm hover:shadow-md hover:border-primary-100 hover:-translate-y-0.5 transition-all duration-300 active:scale-95 flex items-center justify-center gap-2;
+  }
+  .input-field {
+    @apply w-full px-4 py-3 rounded-xl border border-slate-200 bg-white/80 backdrop-blur-sm text-slate-900 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all;
+  }
 }
 
 

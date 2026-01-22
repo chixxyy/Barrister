@@ -221,7 +221,12 @@ const handleFabClick = () => {
 </script>
 
 <template>
-  <main class="min-h-screen bg-gray-50 font-sans text-slate-800">
+  <main class="min-h-screen font-sans text-slate-800 bg-gradient-to-br from-slate-50 via-white to-primary-50 relative selection:bg-primary-500 selection:text-white">
+    <!-- Background Decor (Optional Mesh) -->
+    <div class="fixed inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
+        <div class="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-primary-200/20 rounded-full blur-3xl animate-float"></div>
+        <div class="absolute bottom-[-10%] left-[-5%] w-[600px] h-[600px] bg-accent-light/10 rounded-full blur-3xl animate-float" style="animation-delay: -3s;"></div>
+    </div>
     <!-- PDF Source (Off-screen but visible for generation) -->
     <div class="fixed left-[-9999px] top-0 overflow-visible no-print" aria-hidden="true">
        <div id="pdf-content-source" class="w-[210mm] min-h-[297mm] bg-white">

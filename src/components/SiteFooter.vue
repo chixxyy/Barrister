@@ -3,30 +3,26 @@ import { Mail } from 'lucide-vue-next'
 </script>
 
 <template>
-  <footer class="w-full py-8 px-4 border-t border-slate-100 bg-white/50 backdrop-blur-sm mt-auto">
-    <div class="max-w-4xl mx-auto flex flex-col items-center justify-center text-center gap-4">
+  <footer class="w-full py-12 px-4 border-t border-slate-200 bg-white/50 backdrop-blur-md mt-auto relative z-20">
+    <div class="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
       
-      <!-- Disclaimer -->
-      <p class="text-xs text-slate-400 max-w-2xl leading-relaxed">
-        免責申明：本網站提供的所有文件與資訊僅供參考，不構成法律建議。使用本網站即表示您同意自行承擔風險。若有具體法律問題，建議諮詢專業律師。
+      <!-- Copyright -->
+      <p class="text-sm text-slate-500 font-medium tracking-wide">
+        &copy; {{ new Date().getFullYear() }} Barrister. 版權所有。
       </p>
 
-      <!-- Divider -->
-      <div class="w-12 h-px bg-slate-200"></div>
-
-      <!-- Links/Contact -->
-      <div class="flex items-center gap-6">
+      <!-- Disclaimer & Links -->
+      <div class="flex flex-col md:flex-row items-center gap-6 md:gap-8">
+         <p class="text-xs text-slate-400 max-w-sm leading-relaxed">
+           本網站提供之文件僅供參考，不構成法律建議。<br class="md:hidden">使用即同意自行承擔風險。
+         </p>
+         
          <!-- Contact -->
-         <a href="https://github.com/chixxyy" class="flex items-center gap-2 text-slate-500 hover:text-legal-navy transition-colors text-sm font-medium" target="_blank">
+         <a href="https://github.com/chixxyy" class="flex items-center gap-2 text-slate-500 hover:text-primary-600 transition-colors text-sm font-medium p-2 hover:bg-slate-100 rounded-lg" target="_blank">
             <Mail class="w-4 h-4" />
             <span>聯絡我</span>
          </a>
       </div>
-
-      <!-- Copyright -->
-      <p class="text-xs text-slate-300 mt-2">
-        &copy; {{ new Date().getFullYear() }} Barrister. 版權所有。
-      </p>
 
     </div>
   </footer>
